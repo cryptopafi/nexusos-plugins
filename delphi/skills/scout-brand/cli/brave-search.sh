@@ -1,0 +1,1 @@
+/Users/pafi/.claude/plugins/delphi/skills/scout-web/cli/brave-search.sh

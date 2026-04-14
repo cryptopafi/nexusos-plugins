@@ -1,0 +1,146 @@
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+  <!-- Left Column: Hunt Controls -->
+  <div class="space-y-4">
+
+    <!-- Quick Search -->
+    <div class="glass-card p-5">
+      <h2 class="text-base font-semibold mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-[#58a6ff] pulse"></span>
+        Quick Search
+      </h2>
+      <form hx-post="/api/hunt/search" hx-target="#hunt-results" hx-swap="innerHTML" hx-indicator="#search-spinner">
+        <div class="flex gap-2">
+          <input type="text" name="query" placeholder="e.g. Atlas Copco compressor, Kemppi welder, CNC milling..."
+                 class="hunt-input flex-1" autocomplete="off" list="search-suggestions">
+          <button type="submit" class="hunt-btn px-4 flex items-center gap-2">
+            Search
+            <span id="search-spinner" class="htmx-indicator">
+              <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+        <datalist id="search-suggestions">
+          <option value="Atlas Copco compressor">
+          <option value="Kemppi welder">
+          <option value="Fronius TIG">
+          <option value="Toyota forklift">
+          <option value="Massey Ferguson tractor">
+          <option value="espresso machine closure">
+          <option value="HERMLE CNC">
+          <option value="Kubota excavator">
+          <option value="Samsung TV bundle">
+          <option value="Heidelberg printing">
+        </datalist>
+      </form>
+      <p class="text-xs text-[#64748b] mt-2">Type any brand, model, or equipment type. Searches TWK + SPX via GraphQL.</p>
+    </div>
+
+    <!-- Category Hunt -->
+    <div class="glass-card p-5">
+      <h2 class="text-base font-semibold mb-3">Category Hunt</h2>
+      <form hx-post="/api/hunt" hx-target="#hunt-results" hx-swap="innerHTML" hx-indicator="#cat-spinner">
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs text-[#64748b] uppercase tracking-wider mb-1.5">Category</label>
+            <select name="category" class="hunt-select">
+              <optgroup label="Tier 1 — Profitable (>100% ROI)">
+                <option value="compressors-industrial">Compressors Industrial (139% avg)</option>
+                <option value="welding-branded">Welding Branded (246% avg)</option>
+                <option value="generators">Generators (95% avg)</option>
+              </optgroup>
+              <optgroup label="Tier 2 — Profitable (30-100% ROI)">
+                <option value="espresso-machines-closure">Espresso Machines — Closure (151%)</option>
+                <option value="forklifts">Forklifts (88%)</option>
+                <option value="agricultural">Agricultural (44%)</option>
+                <option value="mini-excavators">Mini Excavators (69%)</option>
+                <option value="packaging-machines">Packaging Machines (66%)</option>
+                <option value="electronics-bundles">Electronics Bundles (34%)</option>
+              </optgroup>
+              <optgroup label="Tier 3 — Marginal (10-30% ROI)">
+                <option value="metalworking">Metalworking (28%)</option>
+                <option value="woodworking">Woodworking (46%)</option>
+                <option value="cnc-machines">CNC Machines (42%)</option>
+                <option value="vans-commercial">Vans Commercial (24%)</option>
+                <option value="medical-basic">Medical Basic (12%)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-[#64748b] uppercase tracking-wider mb-1.5">Platform</label>
+              <select name="region" class="hunt-select">
+                <option value="all">All (TWK + SPX)</option>
+                <option value="TWK">TWK only</option>
+                <option value="SPX">SPX only</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-[#64748b] uppercase tracking-wider mb-1.5">Min ROI %</label>
+              <input type="number" name="min_margin" value="30" min="0" max="500" class="hunt-input font-mono">
+            </div>
+          </div>
+
+          <button type="submit" class="hunt-btn w-full flex items-center justify-center gap-2">
+            Launch Category Hunt
+            <span id="cat-spinner" class="htmx-indicator">
+              <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Auto-Scan Toggle -->
+    <div class="glass-card p-5">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-base font-semibold flex items-center gap-2">
+          Auto-Scan
+          <span id="autoscan-dot" class="w-2 h-2 rounded-full bg-[#64748b]"></span>
+        </h2>
+        <label class="toggle-switch">
+          <input type="checkbox" id="autoscan-toggle" onchange="toggleAutoScan(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <p class="text-xs text-[#64748b] mb-3">Automatically scan Tier 1 + Tier 2 categories every 6 hours.</p>
+      <div class="grid grid-cols-2 gap-3 text-xs">
+        <div>
+          <div class="text-[#64748b]">Status</div>
+          <div id="autoscan-status" class="font-mono text-[#94a3b8]">Idle</div>
+        </div>
+        <div>
+          <div class="text-[#64748b]">Last Scan</div>
+          <div id="autoscan-last" class="font-mono text-[#94a3b8]">Never</div>
+        </div>
+        <div>
+          <div class="text-[#64748b]">Next Scan</div>
+          <div id="autoscan-next" class="font-mono text-[#94a3b8]">—</div>
+        </div>
+        <div>
+          <div class="text-[#64748b]">Deals Found</div>
+          <div id="autoscan-deals" class="font-mono text-[#94a3b8]">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Live Results -->
+  <div>
+    <div class="glass-card p-5 min-h-[300px]">
+      <h2 class="text-base font-semibold mb-3">Hunt Results</h2>
+      <div id="hunt-results" class="text-sm text-[#64748b]">
+        <div class="text-center py-12">
+          <div class="text-2xl mb-2 opacity-50">&#x1F50D;</div>
+          <p>Search for equipment or launch a category hunt.</p>
+          <p class="mt-1 text-xs">Results will appear here in real-time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

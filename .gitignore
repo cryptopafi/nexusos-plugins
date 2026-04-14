@@ -1,0 +1,45 @@
+# Ignore everything by default
+*
+
+# Track only custom/modified plugins
+!delphi/
+!genie-agents/
+!genie-business/
+!genie-codex/
+!genie-cortex/
+!genie-delphi/
+!genie-echelon/
+!genie-intel/
+!genie-ops/
+!genie-process/
+!finance/
+!genie-training/
+!arbitrage-pro/
+!audit-pro/
+
+# Allow all files within tracked directories
+!delphi/**
+!genie-agents/**
+!genie-business/**
+!genie-codex/**
+!genie-cortex/**
+!genie-delphi/**
+!genie-echelon/**
+!genie-intel/**
+!genie-ops/**
+!genie-process/**
+!finance/**
+!genie-training/**
+!arbitrage-pro/**
+!audit-pro/**
+
+# Exclude runtime/generated data within tracked dirs
+delphi/reports/
+delphi/resources/state.json
+arbitrage-pro/state/
+arbitrage-pro/output/
+arbitrage-pro/resources/state.json
+
+# Always track .gitignore itself and README
+!.gitignore
+!README.md

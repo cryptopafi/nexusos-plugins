@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DELPHI PRO • D4 Exhaustive Research</title>
+<meta property="og:title" content="DELPHI PRO: Longevity Interventions Evidence-Based Review 2026">
+<meta property="og:description" content="D4 Exhaustive Research • EPR 18/20 • 32 sources • 42 min">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0A0A0F;
+    --bg-card: #111118;
+    --bg-elevated: #16161f;
+    --bg-glass: rgba(17,17,24,0.85);
+    --bg-hero-overlay: linear-gradient(180deg, transparent 0%, var(--bg) 100%);
+    --text: #f0f0f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #58a6ff;
+    --accent-secondary: #a78bfa;
+    --accent-glow: rgba(88,166,255,0.12);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --border: #1e293b;
+    --border-subtle: rgba(30,41,59,0.5);
+    --radius: 16px;
+    --prose-max: 760px;
+  }
+
+  [data-theme="light"] {
+    --bg: #fafafa;
+    --bg-card: #ffffff;
+    --bg-elevated: #f8fafc;
+    --bg-glass: rgba(255,255,255,0.92);
+    --bg-hero-overlay: linear-gradient(180deg, transparent 0%, var(--bg) 100%);
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --accent: #3b82f6;
+    --accent-secondary: #7c3aed;
+    --accent-glow: rgba(59,130,246,0.08);
+    --border: #e2e8f0;
+    --border-subtle: rgba(226,232,240,0.6);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* --- PROGRESS BAR --- */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent);
+    z-index: 1000;
+    transition: width 100ms linear;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* --- NAV --- */
+  .nav {
+    position: fixed;
+    top: 3px;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    padding: 10px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-subtle);
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .nav.visible { transform: translateY(0); }
+
+  .nav-brand {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .nav-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nav-actions { display: flex; gap: 8px; }
+
+  .btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 150ms ease;
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--text); }
+  .btn-primary { background: var(--accent); color: #0A0A0F; border-color: var(--accent); }
+  .btn-primary:hover { background: #6bb5ff; }
+
+  /* --- HERO (Full Viewport) --- */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-pill {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    backdrop-filter: blur(8px);
+  }
+
+  .hero-pill.depth { background: rgba(88,166,255,0.2); color: var(--accent); border: 1px solid rgba(88,166,255,0.3); }
+  .hero-pill.epr { background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+  .hero-pill.sources { background: rgba(167,139,250,0.15); color: var(--accent-secondary); border: 1px solid rgba(167,139,250,0.25); }
+  .hero-pill.time { background: rgba(148,163,184,0.1); color: var(--text-secondary); border: 1px solid var(--border); }
+
+  .hero h1 {
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    max-width: 800px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.5s forwards;
+  }
+
+  .hero-date {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--text-muted);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* --- CHAPTERS --- */
+  .chapter {
+    max-width: var(--prose-max);
+    margin: 0 auto;
+    padding: 96px 32px;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .chapter.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .chapter-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 12px;
+  }
+
+  .chapter h2 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    line-height: 1.2;
+  }
+
+  .chapter p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    font-size: 16px;
+  }
+
+  .chapter h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 40px 0 16px;
+    letter-spacing: -0.02em;
+  }
+
+  /* --- FULL-BLEED QUOTE --- */
+  .full-bleed-quote {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    padding: 80px 40px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .full-bleed-quote.visible { opacity: 1; }
+
+  .full-bleed-quote blockquote {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 24px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .full-bleed-quote cite {
+    display: block;
+    margin-top: 16px;
+    font-size: 13px;
+    font-style: normal;
+    color: var(--text-muted);
+  }
+
+  /* --- STAT CALLOUT --- */
+  .stat-callout {
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin: 32px 0;
+    text-align: center;
+    box-shadow: 0 0 30px var(--accent-glow);
+  }
+
+  .stat-value {
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  /* --- FINDINGS BENTO --- */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 32px 0;
+  }
+
+  .bento-grid .finding-card:first-child {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 640px) {
+    .bento-grid { grid-template-columns: 1fr; }
+    .bento-grid .finding-card:first-child { grid-column: auto; }
+  }
+
+  .finding-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: all 200ms ease;
+  }
+
+  .finding-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 25px var(--accent-glow);
+    transform: translateY(-2px);
+  }
+
+  .finding-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 10px;
+  }
+
+  .finding-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+
+  .finding-detail {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .finding-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .tier-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+
+  .tier-badge.t1 { background: rgba(16,185,129,0.15); color: var(--success); }
+  .tier-badge.t2 { background: rgba(245,158,11,0.15); color: var(--warning); }
+
+  .relevance-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .relevance-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    border-radius: 2px;
+  }
+
+  /* --- CHART SECTION --- */
+  .chart-section {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 64px 40px;
+  }
+
+  .chart-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  @media (max-width: 640px) {
+    .chart-grid { grid-template-columns: 1fr; }
+  }
+
+  .chart-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .chart-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .chart-canvas { height: 220px; position: relative; }
+
+  /* --- METHODOLOGY --- */
+  .methodology-section {
+    max-width: var(--prose-max);
+    margin: 0 auto;
+    padding: 64px 32px;
+  }
+
+  .meth-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 640px) {
+    .meth-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .meth-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .meth-card-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .meth-card-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* --- FOOTER --- */
+  .footer {
+    text-align: center;
+    padding: 64px 32px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .footer a { color: var(--accent); text-decoration: none; }
+
+  /* --- PRINT --- */
+  @media print {
+    :root { --bg: #fff; --bg-card: #fff; --text: #1a1a1a; --text-secondary: #555; --border: #ddd; }
+    .nav, .progress-bar, .hero-scroll, .btn { display: none !important; }
+    .hero { min-height: auto; padding: 40px; }
+    .chapter, .full-bleed-quote { opacity: 1 !important; transform: none !important; }
+    .full-bleed-quote, .chart-section { width: 100%; margin-left: 0; }
+    .finding-card { break-inside: avoid; }
+  }
+
+  /* --- TOAST --- */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #111118;
+    border: 1px solid rgba(88,166,255,0.2);
+    color: #f0f0f0;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- NAV (appears on scroll) -->
+<nav class="nav" id="mainNav">
+  <span class="nav-brand">DELPHI PRO</span>
+  <span class="nav-title">Longevity Interventions Evidence-Based Review</span>
+  <div class="nav-actions">
+    <button class="btn" onclick="toggleTheme()" id="themeBtn">☀️ Light</button>
+    <button class="btn" onclick="shareReport()">Share</button>
+    <button class="btn btn-primary" onclick="window.print()">PDF</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-meta">
+    <span class="hero-pill depth">D4 Exhaustive</span>
+    <span class="hero-pill epr">EPR 18/20</span>
+    <span class="hero-pill sources">32 sources</span>
+    <span class="hero-pill time">42 min</span>
+  </div>
+  <h1>Longevity Interventions: Evidence-Based Review 2026</h1>
+  <p class="hero-subtitle">A comprehensive analysis of the most promising longevity interventions, evaluated across clinical evidence, mechanism of action, safety profile, and accessibility.</p>
+  <div class="hero-date">March 19, 2026</div>
+  <div class="hero-scroll">Scroll to explore</div>
+</section>
+
+<!-- CHAPTER 1: EXECUTIVE SUMMARY -->
+<div class="chapter" id="ch-summary">
+  <div class="chapter-label">Chapter 01</div>
+  <h2>Executive Summary</h2>
+  <p>This exhaustive review analyzed 32 sources across academic literature, clinical trials, expert discussions, and emerging research to evaluate the current state of evidence-based longevity interventions in 2026.</p>
+  <p>Three intervention categories show the strongest evidence profiles: caloric restriction mimetics (rapamycin, metformin), senolytics (dasatinib + quercetin), and NAD+ precursors (NMN/NR). Exercise remains the single most evidence-backed intervention with the highest benefit-to-risk ratio.</p>
+
+  <div class="stat-callout">
+    <div class="stat-value">73%</div>
+    <div class="stat-label">of reviewed interventions showed positive lifespan effects in at least 2 independent studies</div>
+  </div>
+</div>
+
+<!-- FULL-BLEED QUOTE -->
+<div class="full-bleed-quote" id="quote1">
+  <blockquote>The question is no longer whether we can extend healthspan, but how to prioritize interventions with the strongest evidence-to-risk ratios for human translation.</blockquote>
+  <cite>— Synthesized from 6 T1 sources, March 2026</cite>
+</div>
+
+<!-- CHAPTER 2: KEY FINDINGS -->
+<div class="chapter" id="ch-findings">
+  <div class="chapter-label">Chapter 02</div>
+  <h2>Key Findings</h2>
+
+  <div class="bento-grid">
+    <div class="finding-card">
+      <div class="finding-num">01 — Primary Finding</div>
+      <div class="finding-title">Rapamycin shows the most consistent lifespan extension across model organisms</div>
+      <div class="finding-detail">mTOR inhibition via low-dose rapamycin extends lifespan 10-25% in mice, with emerging human trial data from the PEARL study showing reduced immunosenescence markers. Side effect profile at longevity doses (1-5mg/week) is manageable.</div>
+      <div class="finding-meta">
+        <span class="tier-badge t1">T1</span>
+        <span class="tier-badge t1">T1</span>
+        <span class="tier-badge t1">T1</span>
+        <div class="relevance-bar"><div class="relevance-fill" style="width:95%"></div></div>
+      </div>
+    </div>
+
+    <div class="finding-card">
+      <div class="finding-num">02</div>
+      <div class="finding-title">Senolytics entering Phase 2 clinical trials</div>
+      <div class="finding-detail">Dasatinib + Quercetin combination targeting senescent cells. Unity Biotech and Oisin Biotech advancing human trials for IPF and osteoarthritis.</div>
+      <div class="finding-meta">
+        <span class="tier-badge t1">T1</span>
+        <div class="relevance-bar"><div class="relevance-fill" style="width:90%"></div></div>
+      </div>
+    </div>
+
+    <div class="finding-card">
+      <div class="finding-num">03</div>
+      <div class="finding-title">NAD+ precursors: NMN > NR in latest comparative studies</div>
+      <div class="finding-detail">NMN demonstrates superior bioavailability and tissue distribution. Human studies at 500-1000mg/day show improved NAD+ levels and metabolic markers.</div>
+      <div class="finding-meta">
+        <span class="tier-badge t1">T1</span>
+        <div class="relevance-bar"><div class="relevance-fill" style="width:85%"></div></div>
+      </div>
+    </div>
+
+    <div class="finding-card">
+      <div class="finding-num">04</div>
+      <div class="finding-title">Exercise remains the highest-evidence intervention</div>
+      <div class="finding-detail">Zone 2 cardio (150+ min/week) combined with resistance training reduces all-cause mortality by 40-50%. No pharmaceutical matches this effect size.</div>
+      <div class="finding-meta">
+        <span class="tier-badge t1">T1</span>
+        <div class="relevance-bar"><div class="relevance-fill" style="width:98%"></div></div>
+      </div>
+    </div>
+
+    <div class="finding-card">
+      <div class="finding-num">05</div>
+      <div class="finding-title">Epigenetic clocks validated as primary aging biomarker</div>
+      <div class="finding-detail">DunedinPACE and GrimAge2 clocks now accepted as surrogate endpoints in clinical trials, enabling faster evaluation of interventions.</div>
+      <div class="finding-meta">
+        <span class="tier-badge t2">T2</span>
+        <div class="relevance-bar"><div class="relevance-fill" style="width:82%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAPTER 3: DETAILED ANALYSIS -->
+<div class="chapter" id="ch-analysis">
+  <div class="chapter-label">Chapter 03</div>
+  <h2>Detailed Analysis</h2>
+
+  <h3>Caloric Restriction Mimetics</h3>
+  <p>The field of caloric restriction mimetics has matured significantly. Rapamycin leads with the most robust preclinical evidence, while metformin's TAME trial continues to recruit, aiming to demonstrate that aging itself can be a therapeutic target for FDA approval. [1][3][7][12]</p>
+  <p>Key challenge: optimal dosing protocols for longevity remain unclear. The intermittent dosing paradigm (rapamycin once or twice weekly) appears to preserve immune function while maintaining mTOR inhibition benefits. [8][15]</p>
+
+  <h3>Senolytic Therapies</h3>
+  <p>Hit-and-run senolytic regimens — short treatment courses that clear senescent cells followed by recovery periods — show the most promise. The D+Q combination remains the gold standard, with newer candidates (fisetin, navitoclax derivatives) offering potentially better specificity. [4][9][16][22]</p>
+
+  <h3>NAD+ Metabolism</h3>
+  <p>The NAD+ field has resolved the NMN vs NR debate in favor of NMN for most use cases, based on superior bioavailability data from multiple human trials. However, NR may still be preferred for liver-specific applications. CD38 inhibitors like apigenin are emerging as complementary strategies to boost NAD+ by reducing degradation. [5][10][18][24]</p>
+</div>
+
+<!-- FULL-BLEED QUOTE 2 -->
+<div class="full-bleed-quote" id="quote2">
+  <blockquote>We are witnessing the transition from longevity research to longevity medicine. The next 5 years will determine which interventions cross the translational gap.</blockquote>
+  <cite>— Synthesized from community discussions, Reddit r/longevity + HackerNews</cite>
+</div>
+
+<!-- CHART SECTION -->
+<section class="chart-section" id="ch-sources">
+  <div class="chart-inner">
+    <div class="chapter-label">Source Intelligence</div>
+    <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;letter-spacing:-0.03em;">Source Quality Distribution</h2>
+    <div class="chart-grid">
+      <div class="chart-box">
+        <div class="chart-title">Source Tier Distribution</div>
+        <div class="chart-canvas"><canvas id="tierChart"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">EPR Score Breakdown</div>
+        <div class="chart-canvas"><canvas id="eprChart"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Sources by Channel</div>
+        <div class="chart-canvas"><canvas id="channelChart"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Evidence Strength by Topic</div>
+        <div class="chart-canvas"><canvas id="topicChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section class="methodology-section" id="ch-methodology">
+  <div class="chapter-label">Methodology</div>
+  <h2 style="font-size:28px;font-weight:800;margin-bottom:12px;">How This Research Was Conducted</h2>
+  <p style="color:var(--text-secondary);margin-bottom:32px;">DELPHI PRO D4 Exhaustive pipeline with full scout deployment, critic council, and Opus synthesis.</p>
+
+  <div class="meth-grid">
+    <div class="meth-card">
+      <div class="meth-card-value">D4</div>
+      <div class="meth-card-label">Depth Level</div>
+    </div>
+    <div class="meth-card">
+      <div class="meth-card-value">42m</div>
+      <div class="meth-card-label">Duration</div>
+    </div>
+    <div class="meth-card">
+      <div class="meth-card-value">32</div>
+      <div class="meth-card-label">Sources</div>
+    </div>
+    <div class="meth-card">
+      <div class="meth-card-value">18</div>
+      <div class="meth-card-label">EPR Score /20</div>
+    </div>
+    <div class="meth-card">
+      <div class="meth-card-value">5</div>
+      <div class="meth-card-label">Scouts Deployed</div>
+    </div>
+    <div class="meth-card">
+      <div class="meth-card-value">3×</div>
+      <div class="meth-card-label">Critic Council</div>
+    </div>
+    <div class="meth-card">
+      <div class="meth-card-value">85%</div>
+      <div class="meth-card-label">Confidence</div>
+    </div>
+    <div class="meth-card">
+      <div class="meth-card-value">Opus</div>
+      <div class="meth-card-label">Synthesizer</div>
+    </div>
+    <div class="meth-card">
+      <div class="meth-card-value">22</div>
+      <div class="meth-card-label">Channels Queried</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer">
+  Powered by <a href="#">DELPHI PRO</a> • NexusOS<br>
+  Report ID: delphi-d4-20260319-001 • Generated March 19, 2026
+</div>
+
+
+<!-- Toast -->
+<div class="toast" id="toast">Link copied!</div>
+
+<script>
+// Theme
+function toggleTheme() {
+  const h = document.documentElement;
+  h.dataset.theme = h.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', h.dataset.theme);
+  updateThemeBtn();
+  initCharts();
+}
+function updateThemeBtn() {
+  const btn = document.getElementById('themeBtn');
+  if (!btn) return;
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+}
+if (localStorage.getItem('theme')) document.documentElement.dataset.theme = localStorage.getItem('theme');
+updateThemeBtn();
+
+// Share
+function shareReport() {
+  navigator.clipboard.writeText(window.location.href).then(function() {
+    showToast();
+  }).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = window.location.href;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast();
+  });
+}
+function showToast() {
+  var toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 3000);
+}
+
+// Progress bar
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+
+  // Show nav after hero
+  const nav = document.getElementById('mainNav');
+  nav.classList.toggle('visible', window.scrollY > window.innerHeight * 0.8);
+});
+
+// Scroll animations
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chapter, .full-bleed-quote').forEach(el => obs.observe(el));
+
+// Charts
+function initCharts() {
+  const isDark = document.documentElement.dataset.theme !== 'light';
+  const tc = isDark ? '#94a3b8' : '#64748b';
+  const gc = isDark ? '#1e293b' : '#e2e8f0';
+
+  // Tier
+  const t1 = document.getElementById('tierChart');
+  if (t1._c) t1._c.destroy();
+  t1._c = new Chart(t1, { type:'doughnut', data:{labels:['T1','T2','T3'],datasets:[{data:[18,9,5],backgroundColor:['#10b981','#f59e0b','#64748b'],borderWidth:0}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tc,font:{size:11}}}}} });
+
+  // EPR
+  const e1 = document.getElementById('eprChart');
+  if (e1._c) e1._c.destroy();
+  e1._c = new Chart(e1, { type:'bar', data:{labels:['Evidence','Precision','Relevance','Novelty'],datasets:[{data:[5,4,5,4],backgroundColor:['#58a6ff','#a78bfa','#10b981','#f59e0b'],borderRadius:6,maxBarThickness:40}]}, options:{responsive:true,maintainAspectRatio:false,scales:{y:{max:5,ticks:{color:tc,stepSize:1},grid:{color:gc}},x:{ticks:{color:tc},grid:{display:false}}},plugins:{legend:{display:false}}} });
+
+  // Channel
+  const c1 = document.getElementById('channelChart');
+  if (c1._c) c1._c.destroy();
+  c1._c = new Chart(c1, { type:'bar', data:{labels:['ArXiv','PubMed','Reddit','YouTube','Brave','HN','Gemini Deep'],datasets:[{data:[8,6,5,4,4,3,2],backgroundColor:'#58a6ff',borderRadius:4,maxBarThickness:30}]}, options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{color:tc},grid:{color:gc}},y:{ticks:{color:tc},grid:{display:false}}},plugins:{legend:{display:false}}} });
+
+  // Topic
+  const t2 = document.getElementById('topicChart');
+  if (t2._c) t2._c.destroy();
+  t2._c = new Chart(t2, { type:'radar', data:{labels:['Rapamycin','Senolytics','NAD+','Exercise','Epigenetics','Diet'],datasets:[{data:[95,88,82,98,78,72],backgroundColor:'rgba(88,166,255,0.15)',borderColor:'#58a6ff',pointBackgroundColor:'#58a6ff',pointRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{color:tc,backdropColor:'transparent'},grid:{color:gc},pointLabels:{color:tc,font:{size:11}}}},plugins:{legend:{display:false}}} });
+}
+initCharts();
+</script>
+
+</body>
+</html>

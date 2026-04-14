@@ -1,0 +1,49 @@
+{
+  "name": "delphi-pro",
+  "version": "1.0.0",
+  "description": "DELPHI PRO — Research Orchestrator Plugin. Depth D1-D4, 9 scouts, 3 infrastructure, 3 processing skills.",
+  "author": "NexusOS / Pafi",
+  "skills": [
+    "skills/scout-video",
+    "skills/scout-social",
+    "skills/scout-visual",
+    "skills/scout-web",
+    "skills/scout-knowledge",
+    "skills/scout-deep",
+    "skills/scout-finance",
+    "skills/scout-brand",
+    "skills/scout-domain",
+    "skills/store-cortex",
+    "skills/store-notion",
+    "skills/store-vault",
+    "skills/critic",
+    "skills/synthesizer",
+    "skills/reporter",
+    "skills/research-pro"
+  ],
+  "agents": [
+    "agents/delphi.md"
+  ],
+  "commands": [
+    "commands/research.md",
+    "commands/research-deep.md"
+  ],
+  "command_names": ["/research-pro", "/research-pro-deep"],
+  "hooks": {
+    "pre-research": "hooks/pre-research.sh",
+    "post-research": "hooks/post-research.sh",
+    "on-error": "hooks/on-error.sh"
+  },
+  "procedures": [
+    "procedures/DELPHI-SOC.md"
+  ],
+  "resources": {
+    "templates": "resources/templates/",
+    "state": "resources/state.json",
+    "human_program": "resources/human-program.md",
+    "channel_config": "resources/channel-config.yaml"
+  },
+  "exportable": true,
+  "openclaw_compatible": true,
+  "docs": ["docs/FORGEBUILD-REFERENCE.md", "docs/FORGE-AUDIT-REFERENCE.md", "docs/FIVE-STEPS-REFERENCE.md", "docs/PROMPTING-REFERENCE.md"]
+}

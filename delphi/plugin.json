@@ -1,0 +1,7 @@
+{
+  "name": "delphi-pro",
+  "version": "1.0.0",
+  "description": "DELPHI PRO Research Orchestrator — multi-depth research pipeline with scout subagents, critic evaluation, and multi-channel distribution.",
+  "mcp_strategy": "global-only",
+  "mcp_strategy_note": "DELPHI PRO uses globally-configured MCP servers (Cortex, Tavily, Exa, ArXiv, Wikipedia, DexPaprika). Brave Search uses curl CLI (brave-search.sh) not MCP. No plugin-specific MCP servers. API keys managed via ~/.nexus/.env and macOS Keychain."
+}

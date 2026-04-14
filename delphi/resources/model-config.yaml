@@ -1,0 +1,123 @@
+# DELPHI PRO — Model Routing Configuration
+# SINGLE SOURCE OF TRUTH for all model assignments.
+# Change models HERE, not in individual SKILL.md files.
+# SKILL.md frontmatter `model:` is a FALLBACK if this file is unavailable.
+
+# Last updated: 2026-03-20
+# OpenRouter prefix: add "openrouter/" before model ID when calling via OpenRouter API
+
+roles:
+  # ORCHESTRATOR — makes routing decisions, quality gates
+  orchestrator:
+    model: claude-sonnet-4-6
+    used_by: [agents/delphi.md]
+    note: "Routing, channel selection, EPR gating. NOT for search or synthesis."
+
+  # SCOUTS (basic) — search and extract, structured data, zero reasoning needed
+  scout:
+    model: claude-haiku-4-5
+    used_by: [scout-web, scout-knowledge, scout-finance, scout-domain, scout-brand]
+    note: "Cheapest viable model. Search + extract structured data only."
+
+  # SCOUTS (reasoning) — social/video/visual need content interpretation
+  scout_reasoning:
+    model: claude-sonnet-4-6
+    used_by: [scout-social, scout-video, scout-visual]
+    note: "Reddit discussions, YouTube transcripts, Instagram captions need reasoning to filter and summarize."
+
+  # SCOUT-DEEP — special case, uses external deep research models
+  scout_deep:
+    model: claude-haiku-4-5
+    used_by: [scout-deep]
+    note: "Haiku coordinates, but dispatches to deep_research models below."
+
+  # STORE SKILLS — infrastructure, minimal reasoning
+  store:
+    model: claude-haiku-4-5
+    used_by: [store-cortex, store-notion, store-vault]
+    note: "CRUD operations, no reasoning needed."
+
+  # CRITIC — evaluation, judgment
+  critic_single:
+    model: claude-sonnet-4-6
+    used_by: [critic at D3]
+    note: "Single critic evaluation at D3."
+
+  critic_council:
+    model: claude-opus-4-6
+    used_by: [critic at D4, 3x parallel]
+    note: "Orthogonal lens council. 3 Opus instances. Upgraded from Sonnet per Grill Me D2."
+
+  # SYNTHESIZER — report writing
+  synthesizer_standard:
+    model: claude-sonnet-4-6
+    used_by: [synthesizer at D3]
+    note: "Synthesis for 5-15 sources."
+
+  synthesizer_deep:
+    model: claude-opus-4-6
+    used_by: [synthesizer at D4]
+    note: "Deep synthesis for 20-50+ sources. Most expensive role."
+
+  # REPORTER — HTML/PPTX generation
+  reporter:
+    model: claude-sonnet-4-6
+    used_by: [reporter]
+    note: "Template filling + design. Not creative writing."
+
+# EXTERNAL MODELS (via OpenRouter API, not Claude native)
+external:
+  # Search models (used by scouts via CLI/curl)
+  perplexity_sonar:
+    model: perplexity/sonar
+    cost_per_query: 0.001
+    used_for: "D1 quick search, cheap web lookup"
+
+  perplexity_sonar_pro:
+    model: perplexity/sonar-pro
+    cost_per_query: 0.018
+    used_for: "D2+ primary web search with synthesis"
+
+  perplexity_reasoning:
+    model: perplexity/sonar-reasoning-pro
+    cost_per_query: 0.05
+    used_for: "D3+ complex analysis questions"
+
+  perplexity_deep:
+    model: perplexity/sonar-deep-research
+    cost_per_query: 1.30
+    used_for: "D4 ONLY, requires Pafi approval"
+    max_tokens: 16000
+    requires_approval: true
+
+  # Deep research alternatives
+  opus_cli:
+    model: claude-opus-4-6
+    cost_per_query: "varies"
+    used_for: "D3/D4 deep research via Claude CLI --model claude-opus-4-6"
+
+  # Tongyi REMOVED — hypothesis generation now done inline by orchestrator (Sonnet/Opus)
+  # No external API call needed. Zero cost. More reliable.
+
+  # To be evaluated (from OpenRouter audit)
+  # o3_deep_research:
+  #   model: openai/o3-deep-research
+  #   cost_per_query: "TBD"
+  #   max_tokens: 100000
+  #   used_for: "Alternative to Perplexity Deep for very long reports"
+
+# COST ESTIMATES per depth
+cost_estimates:
+  D1: "$0.01 (orchestrator direct, 2-3 channels)"
+  D2: "$0.05-0.15 (orchestrator + optional scouts)"
+  D3: "$0.30-0.80 (scouts + critic + synthesizer)"
+  D4: "$2.00-5.00 (scouts + critic council + opus synthesizer)"
+  D4_with_deep: "$3.30-6.30 (above + Perplexity Deep $1.30)"
+
+# MIGRATION GUIDE
+# To switch to a different provider (e.g., OpenClaw with non-Anthropic models):
+# 1. Update model IDs in this file ONLY
+# 2. SKILL.md frontmatter model: fields are FALLBACKS (used when this file is unavailable)
+# 3. delphi.md reads this file at startup and overrides SKILL.md defaults
+# 4. For OpenRouter models: prefix with provider (e.g., "openai/gpt-4o", "google/gemini-2.5-pro")
+# 5. Test D1 + D2 after any model change before running D3/D4

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARBITRAGE PRO | Deal Report — {{CATEGORY}}</title>
+  <meta name="description" content="{{DEALS_COUNT}} deals found. Top ROI: {{TOP_ROI}}%. Category: {{CATEGORY}}.">
+  <meta property="og:title" content="Arbitrage Pro — {{CATEGORY}} Deal Report">
+  <meta property="og:description" content="{{DEALS_COUNT}} deals | Top ROI {{TOP_ROI}}% | {{DATE}}">
+  <meta property="og:type" content="article">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0A0A0F;
+      color: #f0f0f0;
+      min-height: 100vh;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(88,166,255,0.04) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 80%, rgba(94,106,210,0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glass-card {
+      background: rgba(17,17,24,0.7);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+    }
+
+    .deal-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .deal-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(88,166,255,0.08);
+    }
+
+    .verdict-buy { color: #4ade80; border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.08); }
+    .verdict-watch { color: #fbbf24; border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.08); }
+    .verdict-skip { color: #f87171; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
+
+    .roi-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #58a6ff, #5E6AD2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    @media print {
+      body { background: white; color: #111; padding: 0; }
+      body::before { display: none; }
+      .glass-card { background: #f5f5f5; backdrop-filter: none; border: 1px solid #ddd; }
+      .stat-value { -webkit-text-fill-color: #111; background: none; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="max-w-5xl mx-auto relative z-10">
+
+    <!-- HEADER -->
+    <header class="text-center mb-8">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <span class="text-xs font-mono text-gray-500 tracking-widest uppercase">Arbitrage Pro</span>
+        <span class="text-gray-700">|</span>
+        <span class="text-xs font-mono text-gray-500">{{DATE}}</span>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">{{CATEGORY}} — Deal Report</h1>
+      <p class="text-gray-400 text-sm">{{REGION}} · Min margin {{MIN_MARGIN}}% · {{LOTS_SCANNED}} lots scanned</p>
+    </header>
+
+    <!-- SUMMARY STATS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="glass-card p-5 text-center">
+        <div class="stat-value">{{LOTS_SCANNED}}</div>
+        <div class="text-xs text-gray-400 mt-1">Lots Scanned</div>
+      </div>
+      <div class="glass-card p-5 text-center">
+        <div class="stat-value">{{DEALS_COUNT}}</div>
+        <div class="text-xs text-gray-400 mt-1">Deals Found</div>
+      </div>
+      <div class="glass-card p-5 text-center">
+        <div class="stat-value">{{TOP_ROI}}%</div>
+        <div class="text-xs text-gray-400 mt-1">Top ROI</div>
+      </div>
+      <div class="glass-card p-5 text-center">
+        <div class="stat-value">{{AVG_MARGIN}}%</div>
+        <div class="text-xs text-gray-400 mt-1">Avg Margin</div>
+      </div>
+    </div>
+
+    <!-- TOP DEAL HIGHLIGHT -->
+    <div class="glass-card p-6 mb-8 border-l-4" style="border-left-color: #4ade80;">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-semibold uppercase tracking-wider text-green-400">Best Deal</span>
+      </div>
+      <h2 class="text-xl font-bold mb-2">{{TOP_DEAL_TITLE}}</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div>
+          <span class="text-gray-400">Buy</span>
+          <div class="font-mono font-bold text-red-400">€{{TOP_DEAL_BUY}}</div>
+        </div>
+        <div>
+          <span class="text-gray-400">Sell</span>
+          <div class="font-mono font-bold text-green-400">€{{TOP_DEAL_SELL}}</div>
+        </div>
+        <div>
+          <span class="text-gray-400">Net Profit</span>
+          <div class="font-mono font-bold text-blue-400">€{{TOP_DEAL_PROFIT}}</div>
+        </div>
+        <div>
+          <span class="text-gray-400">ROI</span>
+          <div class="roi-badge text-2xl text-green-400">{{TOP_DEAL_ROI}}%</div>
+        </div>
+      </div>
+      <div class="mt-3 flex gap-3 text-xs">
+        <a href="{{TOP_DEAL_SOURCE_URL}}" target="_blank" class="text-blue-400 hover:underline">Source →</a>
+        <a href="{{TOP_DEAL_DEST_URL}}" target="_blank" class="text-blue-400 hover:underline">Comparable →</a>
+      </div>
+    </div>
+
+    <!-- DEAL CARDS -->
+    <h2 class="text-lg font-semibold mb-4 text-gray-300">All Deals (ranked by score)</h2>
+
+    <div class="space-y-4 mb-8">
+      <!-- {{DEAL_CARDS_START}} -->
+      <div class="glass-card deal-card p-5">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1">
+            <h3 class="font-semibold text-base mb-1">{{DEAL_TITLE}}</h3>
+            <div class="flex gap-2 text-xs text-gray-400">
+              <span>{{DEAL_PLATFORM}}</span>
+              <span>·</span>
+              <span>{{DEAL_LOCATION}}</span>
+              <span>·</span>
+              <span>Deadline: {{DEAL_DEADLINE}}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="roi-badge text-lg {{DEAL_VERDICT_CLASS}}">{{DEAL_ROI}}%</span>
+            <span class="px-2 py-1 rounded-full text-xs font-semibold border {{DEAL_VERDICT_CLASS}}">{{DEAL_VERDICT}}</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-3 text-xs">
+          <div>
+            <span class="text-gray-500">Buy</span>
+            <div class="font-mono font-medium">€{{DEAL_BUY}}</div>
+          </div>
+          <div>
+            <span class="text-gray-500">Premium</span>
+            <div class="font-mono font-medium">€{{DEAL_PREMIUM}}</div>
+          </div>
+          <div>
+            <span class="text-gray-500">Transport</span>
+            <div class="font-mono font-medium">€{{DEAL_TRANSPORT}}</div>
+          </div>
+          <div>
+            <span class="text-gray-500">Landed</span>
+            <div class="font-mono font-medium">€{{DEAL_LANDED}}</div>
+          </div>
+          <div>
+            <span class="text-gray-500">Sell (est.)</span>
+            <div class="font-mono font-medium text-green-400">€{{DEAL_SELL}}</div>
+          </div>
+          <div>
+            <span class="text-gray-500">Net Profit</span>
+            <div class="font-mono font-bold text-blue-400">€{{DEAL_PROFIT}}</div>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center justify-between">
+          <div class="flex gap-3 text-xs">
+            <span class="text-gray-500">Risk: <span class="font-mono">{{DEAL_RISK}}/10</span></span>
+            <span class="text-gray-500">Score: <span class="font-mono">{{DEAL_SCORE}}</span></span>
+            <span class="text-gray-500">Comparables: <span class="font-mono">{{DEAL_COMPARABLES}}</span></span>
+          </div>
+          <div class="flex gap-2 text-xs">
+            <a href="{{DEAL_SOURCE_URL}}" target="_blank" class="text-blue-400 hover:underline">Source</a>
+            <a href="{{DEAL_DEST_URL}}" target="_blank" class="text-blue-400 hover:underline">Comparable</a>
+          </div>
+        </div>
+      </div>
+      <!-- {{DEAL_CARDS_END}} -->
+    </div>
+
+    <!-- METHODOLOGY -->
+    <div class="glass-card p-5 mb-8 text-xs text-gray-400">
+      <h3 class="font-semibold text-sm text-gray-300 mb-2">Methodology</h3>
+      <ul class="space-y-1 list-disc list-inside">
+        <li>Lots sourced from: {{SOURCES_LIST}}</li>
+        <li>Prices compared on: {{DEST_LIST}}</li>
+        <li>Transport: static rate tables (MVP)</li>
+        <li>ROI = Net Profit / Total Landed Cost × 100%</li>
+        <li>Deal Score = ROI × (1 - Risk/10) × Confidence</li>
+        <li>Threshold: minimum {{MIN_MARGIN}}% ROI</li>
+      </ul>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-xs text-gray-600 pb-8">
+      <p>Generated by Arbitrage Pro v1.0 · NexusOS · {{TIMESTAMP}}</p>
+      <p class="mt-1">Data freshness: prices as of scan time. Verify before bidding.</p>
+    </footer>
+
+  </div>
+
+  <!-- SHARE BUTTON -->
+  <button onclick="shareReport()" class="no-print fixed bottom-6 right-6 glass-card px-4 py-2 text-sm text-blue-400 hover:text-white cursor-pointer z-50 flex items-center gap-2">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
+    Share
+  </button>
+
+  <script>
+    function shareReport() {
+      const url = window.location.href;
+      if (navigator.share) {
+        navigator.share({ title: document.title, url });
+      } else {
+        navigator.clipboard.writeText(url).then(() => {
+          const btn = document.querySelector('button');
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.innerHTML = '<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg> Share'; }, 2000);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

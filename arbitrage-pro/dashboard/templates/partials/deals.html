@@ -1,0 +1,142 @@
+<!-- Filter Bar -->
+<div class="flex items-center gap-3 mb-4 flex-wrap">
+  <div class="flex gap-1">
+    <button class="filter-btn active" onclick="filterDeals('all')">All <span class="font-mono text-xs ml-1" id="count-all">{{ deals|length }}</span></button>
+    <button class="filter-btn" onclick="filterDeals('BUY')">BUY</button>
+    <button class="filter-btn" onclick="filterDeals('WATCH')">WATCH</button>
+  </div>
+  <div class="flex gap-1 ml-auto">
+    <button class="sort-btn active" onclick="sortDeals('roi')" data-sort="roi">ROI</button>
+    <button class="sort-btn" onclick="sortDeals('date')" data-sort="date">Date</button>
+    <button class="sort-btn" onclick="sortDeals('category')" data-sort="category">Category</button>
+  </div>
+</div>
+
+{% if deals %}
+<div class="space-y-3" id="deals-list">
+  {% for deal in deals %}
+  <div class="deal-card" data-verdict="{{ deal.verdict }}" data-roi="{{ deal.roi_pct }}" data-category="{{ deal.category }}" data-ts="{{ deal.timestamp }}">
+    <!-- Card Header (clickable to expand) -->
+    <div class="flex items-start justify-between gap-4" onclick="toggleDeal('{{ loop.index }}')">
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-2 mb-1">
+          {% if deal.verdict == 'BUY' %}
+          <span class="badge badge-buy">BUY</span>
+          {% elif deal.verdict == 'WATCH' %}
+          <span class="badge badge-watch">WATCH</span>
+          {% else %}
+          <span class="badge badge-skip">SKIP</span>
+          {% endif %}
+          <span class="text-sm font-medium truncate">{{ deal.category | replace('_', ' ') | title }}</span>
+          <span class="text-xs font-mono text-[#64748b]">{{ deal.platform }}</span>
+        </div>
+        {% if deal.lot_id %}
+        <div class="text-xs font-mono text-[#64748b] mt-0.5">{{ deal.lot_id }}</div>
+        {% endif %}
+        {% if deal.title %}
+        <div class="text-sm text-[#94a3b8] mt-1 truncate">{{ deal.title }}</div>
+        {% endif %}
+      </div>
+      <div class="text-right flex-shrink-0">
+        <div class="font-mono text-lg font-bold {% if deal.roi_pct > 100 %}roi-positive{% elif deal.roi_pct > 30 %}text-[#58a6ff]{% elif deal.roi_pct > 0 %}roi-neutral{% else %}roi-negative{% endif %}">
+          {{ "%.1f" | format(deal.roi_pct) }}%
+        </div>
+        <div class="text-xs text-[#64748b]">ROI</div>
+      </div>
+    </div>
+
+    <!-- Expandable Details -->
+    <div id="deal-details-{{ loop.index }}" class="deal-details hidden">
+      <!-- Financial Breakdown -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+        {% if deal.buy_total %}
+        <div>
+          <div class="text-[#64748b] text-xs mb-0.5">Buy Total</div>
+          <div class="font-mono font-medium">&euro;{{ "%.0f" | format(deal.buy_total) }}</div>
+        </div>
+        {% endif %}
+        {% if deal.sell_target %}
+        <div>
+          <div class="text-[#64748b] text-xs mb-0.5">Sell Target</div>
+          <div class="font-mono font-medium">&euro;{{ "%.0f" | format(deal.sell_target) }}</div>
+        </div>
+        {% endif %}
+        {% if deal.transport_cost %}
+        <div>
+          <div class="text-[#64748b] text-xs mb-0.5">Transport</div>
+          <div class="font-mono font-medium">&euro;{{ "%.0f" | format(deal.transport_cost) }}</div>
+        </div>
+        {% endif %}
+        {% if deal.profit %}
+        <div>
+          <div class="text-[#64748b] text-xs mb-0.5">Profit</div>
+          <div class="font-mono font-medium {% if deal.profit > 0 %}roi-positive{% else %}roi-negative{% endif %}">&euro;{{ "%.0f" | format(deal.profit) }}</div>
+        </div>
+        {% endif %}
+        {% if deal.max_bid %}
+        <div>
+          <div class="text-[#64748b] text-xs mb-0.5">Max Bid</div>
+          <div class="font-mono font-medium text-[#f59e0b]">&euro;{{ "%.0f" | format(deal.max_bid) }}</div>
+        </div>
+        {% endif %}
+        {% if deal.confidence %}
+        <div>
+          <div class="text-[#64748b] text-xs mb-0.5">Confidence</div>
+          <div class="font-mono font-medium {% if deal.confidence == 'HIGH' %}text-[#22c55e]{% elif deal.confidence == 'MEDIUM' %}text-[#f59e0b]{% else %}text-[#ef4444]{% endif %}">{{ deal.confidence }}</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- DCS Bar -->
+      {% if deal.dcs %}
+      <div class="mt-3 flex items-center gap-2">
+        <span class="text-xs text-[#64748b]">DCS:</span>
+        <span class="font-mono text-xs font-medium">{{ deal.dcs }}/10</span>
+        <div class="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div class="h-full rounded-full {% if deal.dcs >= 7 %}bg-[#22c55e]{% elif deal.dcs >= 5 %}bg-[#58a6ff]{% else %}bg-[#f59e0b]{% endif %}" style="width: {{ (deal.dcs / 10 * 100) | int }}%"></div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if deal.sell_verified %}
+      <div class="mt-2 flex items-center gap-1.5">
+        <div class="w-1.5 h-1.5 rounded-full bg-[#22c55e]"></div>
+        <span class="text-xs text-[#22c55e]">Sell price verified</span>
+      </div>
+      {% endif %}
+
+      <!-- Action Buttons -->
+      <div class="mt-4 flex items-center gap-2 flex-wrap">
+        {% if deal.lot_id %}
+        <a href="/go/{{ deal.lot_id }}" target="_blank" onclick="event.stopPropagation()"
+           class="action-btn action-btn-primary">
+          Open Auction
+        </a>
+        <button onclick="event.stopPropagation(); refreshPrice('{{ deal.lot_id }}')" class="action-btn action-btn-secondary">
+          Refresh Price
+        </button>
+        {% endif %}
+        <a href="https://www.machineseeker.com/mss/{{ deal.category | replace('-', '+') }}" target="_blank" onclick="event.stopPropagation()"
+           class="action-btn action-btn-secondary">
+          Sell Comps
+        </a>
+        <button onclick="event.stopPropagation(); markDeal('{{ loop.index }}', 'bid')" class="action-btn action-btn-success">
+          Mark as Bid
+        </button>
+        <button onclick="event.stopPropagation(); markDeal('{{ loop.index }}', 'skip')" class="action-btn action-btn-danger">
+          Skip
+        </button>
+      </div>
+
+      <!-- Price refresh result -->
+      <div id="price-result-{{ deal.lot_id }}" class="mt-2 text-xs font-mono text-[#94a3b8]"></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="glass-card p-8 text-center">
+  <div class="text-[#64748b] text-sm">No deals yet. Run a hunt to find opportunities.</div>
+  <button onclick="switchTab('hunt')" class="mt-3 hunt-btn text-sm px-4 py-2">Launch Hunt</button>
+</div>
+{% endif %}

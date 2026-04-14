@@ -1,0 +1,43 @@
+{
+  "name": "arbitrage-pro",
+  "version": "1.0.0",
+  "description": "Arbitrage Pro — EU auction-to-marketplace deal hunter. Finds profitable reselling opportunities by monitoring European auction platforms, calculating profitability (landed cost, ROI, risk), and generating ranked deal reports.",
+  "author": "NexusOS / Pafi",
+  "skills": [
+    "skills/hunt",
+    "skills/market-scan",
+    "skills/scout-source",
+    "skills/scout-dest",
+    "skills/scout-logistics",
+    "skills/scout-signals",
+    "skills/scout-demand",
+    "skills/opportunity-engine",
+    "skills/analyzer",
+    "skills/quality-gate",
+    "skills/reporter",
+    "skills/store-cortex",
+    "skills/store-cache",
+    "skills/lot-verifier",
+    "skills/publish-report"
+  ],
+  "agents": ["agents/arbitrage.md"],
+  "commands": ["commands/hunt.md", "commands/market-scan.md"],
+  "command_names": ["/hunt", "/market-scan"],
+  "hooks": {
+    "pre-hunt": "hooks/pre-hunt.sh",
+    "post-hunt": "hooks/post-hunt.sh",
+    "on-error": "hooks/on-error.sh"
+  },
+  "procedures": ["procedures/ARBITRAGE-SOC.md"],
+  "resources": {
+    "model-config": "resources/model-config.yaml",
+    "channel-config": "resources/channel-config.yaml",
+    "contracts": "resources/contracts.md",
+    "tax-tables": "resources/tax-tables.yaml",
+    "transport-rates": "resources/transport-rates.yaml",
+    "state": "resources/state.json"
+  },
+  "dependencies": ["delphi"],
+  "exportable": true,
+  "openclaw_compatible": true
+}

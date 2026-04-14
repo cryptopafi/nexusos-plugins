@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DELPHI PRO | Multi-Agent Orchestration Frameworks</title>
+  <meta name="description" content="Research report: Best multi-agent orchestration frameworks March 2026. EPR 19/20, 38 sources across 6 channels.">
+  <meta property="og:title" content="Multi-Agent Orchestration Frameworks — DELPHI PRO Report">
+  <meta property="og:description" content="EPR 19/20 | 38 Sources | 6 Channels | D2 Standard Research">
+  <meta property="og:type" content="article">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0A0A0F;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Ambient background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(88,166,255,0.04) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 80%, rgba(94,106,210,0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card-main {
+      background: rgba(17,17,24,0.7);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03),
+                  0 4px 24px rgba(0,0,0,0.4),
+                  0 0 80px rgba(88,166,255,0.06);
+      max-width: 520px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .card-main::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(88,166,255,0.3) 50%, transparent 100%);
+    }
+
+    .epr-ring {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #58a6ff 0deg,
+        #58a6ff calc(var(--epr-pct) * 3.6deg),
+        rgba(255,255,255,0.06) calc(var(--epr-pct) * 3.6deg),
+        rgba(255,255,255,0.06) 360deg
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 30px rgba(88,166,255,0.15);
+    }
+
+    .epr-ring-inner {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: #111118;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .finding-item {
+      display: flex;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      align-items: flex-start;
+    }
+
+    .finding-item:last-child {
+      border-bottom: none;
+    }
+
+    .finding-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #58a6ff;
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.12);
+      border-radius: 100px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .chart-container {
+      width: 80px;
+      height: 80px;
+    }
+
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #58a6ff 0%, #5E6AD2 100%);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: -0.01em;
+    }
+
+    .share-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(88,166,255,0.3);
+    }
+
+    .share-btn:active {
+      transform: translateY(0);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #111118;
+      border: 1px solid rgba(88,166,255,0.2);
+      color: #f0f0f0;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 100;
+      opacity: 0;
+      transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 16px; }
+      .card-main { border-radius: 16px; }
+      .epr-ring { width: 100px; height: 100px; }
+      .epr-ring-inner { width: 80px; height: 80px; }
+      .epr-ring-inner span:first-child { font-size: 26px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card-main">
+    <!-- Header -->
+    <div style="padding: 28px 28px 0 28px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="width: 8px; height: 8px; border-radius: 50%; background: #58a6ff; box-shadow: 0 0 8px rgba(88,166,255,0.5);"></div>
+          <span style="font-size: 12px; font-weight: 600; color: #58a6ff; letter-spacing: 0.08em; text-transform: uppercase;">DELPHI PRO</span>
+          <span style="font-size: 12px; color: #475569; margin: 0 4px;">|</span>
+          <span style="font-size: 12px; color: #64748b; font-weight: 500;">D2 Report Card</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #475569;">2026-03-20</span>
+      </div>
+
+      <h1 style="font-size: 18px; font-weight: 700; line-height: 1.35; color: #f0f0f0; letter-spacing: -0.025em; margin-bottom: 16px;">
+        Best Multi-Agent Orchestration Frameworks March 2026
+      </h1>
+
+      <!-- Meta pills -->
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+        <span class="meta-pill">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          77s
+        </span>
+        <span class="meta-pill">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          38 sources
+        </span>
+        <span class="meta-pill">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 00-8 0v2"/></svg>
+          6 channels
+        </span>
+      </div>
+    </div>
+
+    <!-- EPR Hero + Source Chart -->
+    <div style="padding: 0 28px 24px 28px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="epr-ring" style="--epr-pct: 95;">
+          <div class="epr-ring-inner">
+            <span style="font-size: 32px; font-weight: 800; color: #f0f0f0; letter-spacing: -0.03em; line-height: 1;">19</span>
+            <span style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 2px;">/20 EPR</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #10b981; margin-bottom: 4px;">Excellent</div>
+          <div style="font-size: 12px; color: #64748b; line-height: 1.5;">
+            High consensus<br>across all channels
+          </div>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="sourceChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div style="height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.06) 80%, transparent); margin: 0 28px;"></div>
+
+    <!-- Key Findings -->
+    <div style="padding: 24px 28px;">
+      <div style="font-size: 11px; font-weight: 600; color: #58a6ff; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px;">Key Findings</div>
+
+      <div class="finding-item">
+        <div class="finding-dot"></div>
+        <div>
+          <div style="font-size: 14px; color: #f0f0f0; font-weight: 500; line-height: 1.5;">LangGraph leads in production-readiness</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Most mature state machine approach for complex agent workflows</div>
+        </div>
+      </div>
+
+      <div class="finding-item">
+        <div class="finding-dot"></div>
+        <div>
+          <div style="font-size: 14px; color: #f0f0f0; font-weight: 500; line-height: 1.5;">CrewAI dominates developer experience</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Lowest time-to-first-agent, role-based abstractions feel natural</div>
+        </div>
+      </div>
+
+      <div class="finding-item">
+        <div class="finding-dot"></div>
+        <div>
+          <div style="font-size: 14px; color: #f0f0f0; font-weight: 500; line-height: 1.5;">OpenAI Agents SDK has cleanest handoff protocol</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Native tool-calling + agent handoff patterns set a new standard</div>
+        </div>
+      </div>
+
+      <div class="finding-item">
+        <div class="finding-dot"></div>
+        <div>
+          <div style="font-size: 14px; color: #f0f0f0; font-weight: 500; line-height: 1.5;">Google ADK excels at interoperability</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 2px;">A2A protocol enables cross-framework agent communication</div>
+        </div>
+      </div>
+
+      <div class="finding-item">
+        <div class="finding-dot"></div>
+        <div>
+          <div style="font-size: 14px; color: #f0f0f0; font-weight: 500; line-height: 1.5;">AutoGen/AG2 pioneered debate patterns</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Multi-turn conversational agents with built-in self-critique</div>
+        </div>
+      </div>
+
+      <div class="finding-item">
+        <div class="finding-dot"></div>
+        <div>
+          <div style="font-size: 14px; color: #f0f0f0; font-weight: 500; line-height: 1.5;">Claude Agent SDK sets the bar for safety</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Guardrails-first design with human-in-the-loop by default</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div style="height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.06) 80%, transparent); margin: 0 28px;"></div>
+
+    <!-- Source breakdown + Share -->
+    <div style="padding: 20px 28px 24px 28px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; gap: 16px;">
+        <div style="text-align: center;">
+          <div style="font-size: 18px; font-weight: 700; color: #10b981;">8</div>
+          <div style="font-size: 10px; color: #64748b; font-weight: 500; margin-top: 2px;">T1 Primary</div>
+        </div>
+        <div style="width: 1px; background: rgba(255,255,255,0.06);"></div>
+        <div style="text-align: center;">
+          <div style="font-size: 18px; font-weight: 700; color: #58a6ff;">22</div>
+          <div style="font-size: 10px; color: #64748b; font-weight: 500; margin-top: 2px;">T2 Secondary</div>
+        </div>
+        <div style="width: 1px; background: rgba(255,255,255,0.06);"></div>
+        <div style="text-align: center;">
+          <div style="font-size: 18px; font-weight: 700; color: #f59e0b;">8</div>
+          <div style="font-size: 10px; color: #64748b; font-weight: 500; margin-top: 2px;">T3 Tertiary</div>
+        </div>
+      </div>
+
+      <button class="share-btn" onclick="shareReport()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        Share
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding: 14px 28px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; gap: 6px;">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="#58a6ff"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>
+      <span style="font-size: 11px; color: #475569; font-weight: 500;">Powered by DELPHI PRO</span>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast">Link copied to clipboard</div>
+
+  <script>
+    // Source tier pie chart
+    const ctx = document.getElementById('sourceChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['T1 Primary', 'T2 Secondary', 'T3 Tertiary'],
+        datasets: [{
+          data: [8, 22, 8],
+          backgroundColor: ['#10b981', '#58a6ff', '#f59e0b'],
+          borderWidth: 0,
+          spacing: 2,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        cutout: '65%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#111118',
+            titleColor: '#f0f0f0',
+            bodyColor: '#94a3b8',
+            borderColor: 'rgba(255,255,255,0.06)',
+            borderWidth: 1,
+            cornerRadius: 8,
+            padding: 10,
+            titleFont: { family: 'Inter', weight: '600' },
+            bodyFont: { family: 'Inter' },
+            displayColors: true,
+            boxPadding: 4,
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ' + context.raw + ' sources';
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Share functionality
+    function shareReport() {
+      const shareData = {
+        title: 'Multi-Agent Orchestration Frameworks — DELPHI PRO Report',
+        text: 'EPR 19/20 | 38 Sources | Best multi-agent orchestration frameworks March 2026',
+        url: window.location.href,
+      };
+
+      if (navigator.share) {
+        navigator.share(shareData).catch(() => copyToClipboard());
+      } else {
+        copyToClipboard();
+      }
+    }
+
+    function copyToClipboard() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showToast();
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = window.location.href;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast();
+      });
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+  </script>
+</body>
+</html>

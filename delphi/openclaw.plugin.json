@@ -1,0 +1,36 @@
+{
+  "name": "delphi-pro",
+  "version": "1.0.0",
+  "description": "DELPHI PRO Research Orchestrator — AI research from instant lookups to exhaustive investigations",
+  "author": "NexusOS",
+  "license": "MIT",
+  "engines": { "openclaw": ">=0.9.0" },
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "openrouter_api_key": { "type": "string", "description": "OpenRouter API key for Perplexity models" },
+      "brave_api_key": { "type": "string", "description": "Brave Search API key" },
+      "namesilo_api_key": { "type": "string", "description": "NameSilo API key for domain checks" },
+      "apify_api_key": { "type": "string", "description": "Apify API key for Instagram/Google scraping" },
+      "groq_api_key": { "type": "string", "description": "Groq API key for YouTube Whisper fallback" },
+      "notion_token": { "type": "string", "description": "Notion integration token" },
+      "gemini_api_key": { "type": "string", "description": "Google Gemini API key for deep research" },
+      "guardian_api_key": { "type": "string", "default": "test", "description": "Guardian API key (free tier uses 'test')" },
+      "gnews_api_key": { "type": "string", "description": "GNews API key for news search" },
+      "vps_host": { "type": "string", "description": "VPS hostname for HTML report deployment" },
+      "max_cost_per_run": { "type": "number", "default": 8.0, "description": "Max USD per research run" }
+    },
+    "required": ["openrouter_api_key"]
+  },
+  "capabilities": {
+    "skills": true,
+    "commands": true,
+    "hooks": true,
+    "tools": false,
+    "services": false
+  },
+  "bundle": {
+    "type": "claude",
+    "path": "."
+  }
+}

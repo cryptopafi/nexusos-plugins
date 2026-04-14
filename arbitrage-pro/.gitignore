@@ -1,0 +1,16 @@
+# State files (runtime, not source-controlled)
+state/*.json
+
+# Environment files
+.env
+.env.local
+
+# Hookify local overrides
+*.local.md
+
+# Temp files
+/tmp/arbitrage-*.html
+
+# OS files
+.DS_Store
+__pycache__/

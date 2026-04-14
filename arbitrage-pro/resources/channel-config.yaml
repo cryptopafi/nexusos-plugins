@@ -1,0 +1,386 @@
+# Channel Configuration — Arbitrage Pro
+# Defines active auction platforms, resale marketplaces, and their scraper configs
+
+# ─── VPS & Infrastructure ────────────────────────────────────
+infrastructure:
+  vps_host: "89.116.229.189"
+  vps_user: "pafi"
+  vps_report_path: "/var/www/nexus"
+  vps_base_url: "http://89.116.229.189/nexus"
+
+# ─── Auction Source Channels ─────────────────────────────────
+auction_channels:
+  troostwijk:
+    enabled: true
+    wave: 1
+    url: "https://www.troostwijkauctions.com"
+    discovery_method: sonar-pro           # Phase 1: Sonar discovers lot URLs
+    extraction_method: agent-browser      # Phase 2: local Playwright extracts exact prices (FREE)
+    fallback_extraction: exa              # Phase 2b: Exa if agent-browser unavailable
+    max_items: 20
+    categories: [restaurant-equipment, industrial, electronics, office-furniture, vehicles, construction, medical, agricultural]
+    regions: [NL, DE, BE, FR, IT, PL, RO, AT, SE, DK, ES, UK]
+    rate_limit: "sequential, 2s delay between lots"
+    agent_browser_config:
+      cookie_accept: "Accept All Cookies"  # Button text for consent banner
+      wait_after_load: 3000                # ms — wait for JS to render bid prices
+      price_selectors:                     # Tested 2026-03-21, working
+        current_bid: "regex: €\\s*[\\d.,]+"
+        bid_count: "regex: (\\d+)\\s*[Bb]ids?"
+        deadline: "regex: [Cc]los.*:\\s*(.*)"
+        location: "link containing ', NL' or ', DE' etc."
+    # buyers_premium_pct: see tax-tables.yaml (canonical source) — 23% worst case
+    notes: "TBAuctions group. agent-browser extracts real bid prices + bid history via JS eval. ATLAS API for W3."
+
+  catawiki:
+    enabled: true
+    wave: 1
+    url: "https://www.catawiki.com"
+    discovery_method: exa                 # Exa primary — Catawiki blocks headless browsers
+    extraction_method: exa                # Exa extracts "Final bid: €X" + estimates + bid count directly
+    fallback_extraction: sonar-pro        # Sonar Pro as fallback for broader discovery
+    anti_bot_note: "agent-browser returns 'Access Denied' — Catawiki blocks all headless browsers"
+    max_items: 20
+    categories: [collectibles, watches, art, vintage, electronics]
+    regions: [NL, DE, FR, IT, ES, BE]
+    rate_limit: "sequential, 2s delay"
+    # buyers_premium: see tax-tables.yaml (canonical source) — 9% + €3 fixed
+    notes: "Expert-curated lots. 75K objects/week. Exa confirmed extracting 'Sold for €X' from Catawiki."
+
+  surplex:
+    enabled: false
+    wave: 3
+    url: "https://www.surplex.com"
+    method: atlas-api
+    categories: [metalworking, woodworking, construction]
+    notes: "TBAuctions group. Same ATLAS API as Troostwijk."
+
+  netbid:
+    enabled: false
+    wave: 3
+    url: "https://www.netbid.com"
+    method: custom-scraper
+    categories: [industrial, insolvency]
+
+  euro-auctions:
+    enabled: false
+    wave: 3
+    url: "https://www.euroauctions.com"
+    method: custom-scraper
+    categories: [construction, agricultural, vehicles]
+    notes: "ALL UNRESERVED — no minimum price."
+
+  bidspotter:
+    enabled: false
+    wave: 3
+    url: "https://www.bidspotter.com"
+    method: custom-scraper
+    categories: [industrial, commercial]
+    notes: "Aggregator — links to individual auctioneers."
+
+  klaravik:
+    enabled: false
+    wave: 3
+    url: "https://www.klaravik.se"
+    method: custom-scraper
+    categories: [construction, agricultural, vehicles, industrial]
+    regions: [SE, DK, FI]
+    # buyers_premium: see tax-tables.yaml (canonical source) — 12%
+    notes: "TBAuctions group. Nordic focus. 70K lots/year, 500K+ bidders."
+
+  vavato:
+    enabled: false
+    wave: 3
+    url: "https://www.vavato.com"
+    method: custom-scraper
+    categories: [agricultural, industrial, vehicles, office-furniture]
+    regions: [BE, NL]
+    # buyers_premium: see tax-tables.yaml (canonical source) — 15%
+    notes: "TBAuctions group. Benelux focus."
+
+  openlane:
+    enabled: false
+    wave: 2
+    url: "https://www.openlane.eu"
+    vertical: vehicles                        # separate vertical from industrial arbitrage
+    discovery_method: agent-browser           # React SPA, no public API
+    extraction_method: agent-browser          # must scrape — no GraphQL/REST API
+    fallback_extraction: null                 # no API fallback available
+    max_items: 50
+    categories: [vehicles]
+    vehicle_types: [saloon, estate, hatchback, suv, mpv, pickup, minibus, truck-light]
+    vehicle_origins: [ex-leasing, ex-fleet, ex-rental, dealer-stock]
+    regions: [BE, NL, DE, FR, IT, ES, SE, UK, LU]
+    buyer_regions: [RO, BG, PL, PT]          # known active buyer countries
+    auction_types:
+      dynamic: {assignment_guaranteed: false, seller_decides: true}
+      target: {assignment_guaranteed: "if bid >= target", seller_decides: false}
+      buy_now: {assignment_guaranteed: "at buy-now price", seller_decides: false}
+      blind: {assignment_guaranteed: false, seller_decides: true}
+      stock_sale: {assignment_guaranteed: true, fixed_price: true}
+    fees:
+      auction_fee: "tiered by hammer price (see openlane.eu fee table)"
+      country_fee: "flat per vehicle, varies by origin country (shown per lot)"
+      seller_specific_fee: "additional, shown per lot"
+      export_doc_fee: 110                     # EUR, only for non-EU export
+      self_pickup_fee: 85                     # EUR, if arranging own transport
+      optimo_service: 160                     # EUR, optional payment flexibility
+      parking_late_pickup: "€50 admin + €5/day after 2 weeks"
+    payment: "bank transfer within 2 business days"
+    registration:
+      type: "B2B only"
+      requirements: ["company VAT number", "car-trading NACE code (45.11/50.10)", "ID verification after 1st win", "company docs after 5th purchase"]
+      referral_bonus: "€300 credit for referrer + referred"
+    active_lots: "~12,000 vehicles"
+    parent: "OPENLANE Inc. (ex-KAR Global) — 1.5M vehicles/year, $29B GMV"
+    sell_destinations:
+      primary: [olx.ro, autovit.ro, mobile.de, autoscout24.de]
+      secondary: [ebay.de, marktplaats.nl, leboncoin.fr]
+    notes: |
+      Wholesale car auction (ex-ADESA Europe). B2B only, requires car-trading NACE.
+      No public API — React SPA needs agent-browser. ~12K active vehicles.
+      Assignment risk on Dynamic/Blind (seller decides). Target/BuyNow = guaranteed.
+      RO buyers confirmed (testimonials). EU cross-border = no export docs needed.
+      Separate vertical from industrial pipeline — needs dedicated vehicle analyzer.
+
+# ─── Discovery Engine (cross-platform, Phase 1) ──────────────
+discovery_channels:
+  sonar-pro:
+    enabled: true
+    wave: 1
+    method: openrouter-api
+    model: "perplexity/sonar-pro"
+    key_name: "OPENROUTER_API_KEY"
+    script: "scripts/sonar-query.sh"
+    role: "discovery — broad multi-platform lot/price finding"
+    notes: "Primary discovery engine. Synthesizes from search index. Superior fuzzy matching across NL/DE/FR/RO."
+
+  exa:
+    enabled: true
+    wave: 1
+    method: mcp
+    mcp_tool: "mcp__exa__web_search_advanced_exa"
+    role: "primary sell-price extraction — structured neural search with includeDomains + livecrawl"
+    capabilities:
+      - "includeDomains filtering (olx.ro, ebay.de, catawiki.com)"
+      - "includeText filtering ('sold for', 'vândut')"
+      - "livecrawl: preferred — real-time page content"
+      - "Returns URL + snippet with price inline"
+    notes: "Best quality for sell-side price discovery. Use for OLX, eBay, Catawiki comparables."
+
+  brave-search:
+    enabled: true
+    wave: 1
+    method: rest-api
+    url: "https://api.search.brave.com/res/v1/web/search"
+    key_name: "BRAVE_API_KEY"
+    role: "supplementary discovery — broad market lookups, extra coverage"
+    capabilities:
+      - "site: operator for domain filtering"
+      - "Free tier 2000 req/month"
+      - "Good for OLX listing discovery"
+      - "Cannot extract eBay sold prices (returns category pages only)"
+    notes: "Supplementary to Exa. Use for broad market lookups, demand discovery, general research. NOT primary for sell prices."
+
+# ─── Resale Destination Channels ─────────────────────────────
+marketplace_channels:
+  olx:
+    enabled: true
+    wave: 1
+    url: "https://www.olx.ro"
+    method: agent-browser                 # Primary: local Playwright, structured JSON, 10+ results
+    fallback_method: exa                  # Fallback: Exa with includeDomains: ["olx.ro"]
+    max_items: 15
+    country: "ro"
+    selling_fee_pct: 0
+    agent_browser_config:
+      search_url: "https://www.olx.ro/oferte/q-{query}/"
+      cookie_accept: null                 # OLX doesn't show consent banner
+      item_selector: '[data-cy="l-card"]'
+      price_selector: '[data-testid="ad-price"], [class*="price"]'
+    exa_config:                           # For fallback
+      includeDomains: ["olx.ro"]
+      livecrawl: "preferred"
+      numResults: 10
+      textMaxCharacters: 500             # E11 fix: prevent 80KB+ responses
+      highlightsPerUrl: 1
+    broader_search_tiers:                 # E6 fix: tiered search for niche brands
+      - "{brand} {model}"                 # Tier 1: exact
+      - "{brand} espressor profesional"   # Tier 2: brand + category
+      - "espressor profesional {specs}"   # Tier 3: category + specs (e.g., "3 grupuri")
+      - "espressor profesional"           # Tier 4: generic
+    min_results_threshold: 3              # Stop at tier with ≥3 results
+
+  ebay:
+    enabled: true
+    wave: 1
+    url: "https://www.ebay.de"
+    method: exa                           # Primary: Exa on eBay.com/.de/.co.uk — agent-browser triggers CAPTCHA on 2nd request
+    fallback_method: sonar-pro            # Fallback: Sonar Pro cross-platform synthesis
+    anti_bot_note: "agent-browser works for 1st request but eBay triggers CAPTCHA on 2nd+ — use Exa instead"
+    selling_fee_pct: 0                    # Private EEA sellers: 0% since March 2023
+    selling_fee_pct_business: 11
+    regulatory_fee_pct: 0.35
+    agent_browser_config:
+      search_url: "https://www.ebay.de/sch/i.html?_nkw={query}&LH_Complete=1&LH_Sold=1&LH_ItemCondition=3000"
+      cookie_accept: "Alle Datenschutzbestimmungen und Einstellungen akzeptieren"
+      wait_after_load: 2000
+      exclude_title_words: ["parts", "gasket", "pump", "motor", "Ersatzteil", "boiler", "valve", "seal"]  # E7 fix
+    exa_config:                           # Fallback: eBay.com has 10x commercial equipment vs .de (E7 fix)
+      includeDomains: ["ebay.com", "ebay.de", "ebay.co.uk"]
+      livecrawl: "preferred"
+      numResults: 5
+      textMaxCharacters: 500             # E11 fix
+      highlightsPerUrl: 1
+    notes: "agent-browser gives REAL sold prices via LH_Sold=1. LH_ItemCondition=3000 filters used items only. Exa fallback uses eBay.com (more inventory). Parts excluded via title filter."
+
+  marktplaats:
+    enabled: false
+    wave: 3
+    url: "https://www.marktplaats.nl"
+    method: official-api
+    api_docs: "https://api.marktplaats.nl/docs/v1"
+    selling_fee_pct: 0
+
+  kleinanzeigen:
+    enabled: false
+    wave: 3
+    url: "https://www.kleinanzeigen.de"
+    method: unofficial-api
+    github: "DanielWTE/ebay-kleinanzeigen-api"
+
+  vinted:
+    enabled: false
+    wave: 3
+    url: "https://www.vinted.com"
+    method: apify
+    categories: [fashion, clothing]
+    selling_fee_pct: 0
+
+# ─── Transport Channels ─────────────────────────────────────
+transport_channels:
+  static-tables:
+    enabled: true
+    wave: 1
+    method: yaml-config
+    config_file: "resources/transport-rates.yaml"
+
+  trans-eu:
+    enabled: false
+    wave: 2
+    url: "https://www.trans.eu"
+    method: rest-api
+    api_docs: "https://www.trans.eu/api/"
+    features: [freight-offer, freight-search, price-insights]
+    notes: "Price Insights API gives market rate benchmarks by route."
+
+  timocom:
+    enabled: false
+    wave: 3
+    url: "https://www.timocom.co.uk"
+    method: rest-api
+    api_docs: "https://www.postman.com/timocom/timocom/documentation"
+
+# ─── Signal Channels ─────────────────────────────────────────
+signal_channels:
+  eu-fuel-open-data:
+    enabled: false
+    wave: 2
+    method: free-api
+    url: "https://data.europa.eu/data/datasets/ed6818e3-33f2-4747-873f-82a4f6af4667"
+    cost: free
+
+  exchange-api:
+    enabled: false
+    wave: 2
+    method: free-api
+    url: "https://github.com/fawazahmed0/exchange-api"
+    cost: free
+    notes: "200+ currencies, daily updates, no rate limits."
+
+  ecb-sdw:
+    enabled: false
+    wave: 2
+    method: cli
+    cli_tool: "~/.nexus/cli-tools/ecb-sdw get-exchange-rates -o json"
+    cost: free
+
+  fred:
+    enabled: false
+    wave: 2
+    method: mcp
+    mcp_tool: "mcp__DELPHI_FRED__get_series"
+    cost: free
+
+  commodities-api:
+    enabled: false
+    wave: 2
+    method: freemium-api
+    url: "https://commodities-api.com/"
+    cost: free-tier
+
+# ─── Demand Channels ─────────────────────────────────────────
+demand_channels:
+  publi24:
+    enabled: false
+    wave: 2
+    url: "https://www.publi24.ro"
+    method: brave-search
+    keywords: ["caut", "cumpăr", "doresc"]
+
+  kros:
+    enabled: false
+    wave: 2
+    url: "https://kros.ro"
+    method: web-scraper
+    notes: "Romania B2B RFQ marketplace."
+
+  alibaba-rfq:
+    enabled: false
+    wave: 2
+    url: "https://seller.alibaba.com/rfq"
+    method: official-api
+    notes: "20K+ requests/day. Official API at developer.alibaba.com."
+
+  machineseeker:
+    enabled: true
+    wave: 1
+    url: "https://www.machineseeker.com"
+    mirror_url: "https://www.maschinensucher.de"
+    method: exa                           # Primary: Exa livecrawl — no anti-bot, reliable
+    fallback_method: sonar-pro
+    categories: [compressors, welding, CNC, forklifts, generators, metalworking, woodworking, construction, agricultural]
+    priority: PRIMARY                      # Use BEFORE OLX/eBay for industrial categories
+    regions: [DE, NL, PL, AT, FR, IT, BE, SE, CZ, ES]
+    selling_fee_pct: 0                    # Free classifieds (seller pays listing fee EUR 4.49/month)
+    exa_config:
+      includeDomains: ["machineseeker.com", "maschinensucher.de"]
+      livecrawl: "preferred"
+      numResults: 5
+      textMaxCharacters: 800
+      highlightsPerUrl: 1
+      highlightsQuery: "price EUR"
+    price_patterns:                        # Regex patterns found in Exa highlights
+      - "€[\\d.,]+ Fixed price plus VAT"
+      - "€[\\d.,]+ ONO plus VAT"
+      - "[\\d.,]+ € Festpreis zzgl. MwSt."
+      - "[\\d.,]+ € VB zzgl. MwSt."
+    skip_patterns:
+      - "Preisinfo"                        # Price on request — no public price
+      - "Price info"
+    currency_conversions:
+      PLN: 4.25                            # Polish listings in PLN → EUR
+      CZK: 25.0                            # Czech listings
+    discount_by_type:
+      VB: 0.85                             # Verhandlungsbasis (negotiable) — 15% off
+      Festpreis: 0.90                      # Fixed price — 10% off
+      ONO: 0.85                            # Or Nearest Offer — 15% off
+    notes: |
+      Europe's largest used industrial machinery marketplace. 11M buyers, 200K+ listings.
+      machineseeker.com (EN/international) and maschinensucher.de (DE) share the same
+      inventory — one Exa call with includeDomains covers both.
+      Seller-side REST API exists (listing management only) — NOT usable for price scraping.
+      Confirmed working via Exa livecrawl 2026-03-22.
+      URL patterns: /mss/[brand]+[model] (search) | /[brand]-[model]/i-[id] (listing).
+      Verified live prices for: Atlas Copco GA30 (EUR 3,490-4,700), ZT110-class (EUR 3,750+),
+      Kemppi MasterTig (EUR 1,250), Toyota 8FBE16T (EUR 13,900-26,890), Airpress APS (EUR 1,550-5,800).

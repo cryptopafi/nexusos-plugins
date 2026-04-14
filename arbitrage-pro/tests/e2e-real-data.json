@@ -1,0 +1,83 @@
+{
+  "test_id": "E2E-001",
+  "test_name": "Full Pipeline — Real Data from Live Auctions",
+  "timestamp": "2026-03-21T12:55:00Z",
+  "description": "End-to-end pipeline test using real lots from Surplex/Troostwijk and real prices from OLX.ro collected via Exa search on 2026-03-21",
+
+  "scout_source_results": {
+    "channels_searched": 2,
+    "lots": [
+      {
+        "id": "surplex-A1-43079-27",
+        "platform": "surplex",
+        "category": "industrial",
+        "title": "SOTOS VOJUS TURNTEC 63 High Capacity CNC Lathe",
+        "price": 2500,
+        "currency": "EUR",
+        "location": "CZ",
+        "condition": "used-good",
+        "deadline": "2026-04-01T18:00:00Z",
+        "url": "https://www.surplex.com/en/l/sotos-vojus-turntec-63-high-capacity-cnc-lathe-A1-43079-27",
+        "description_raw": "Siemens Sinumerik 840D, 2001, 4500kg, max turning diameter 630mm",
+        "buyers_premium_pct": 15
+      },
+      {
+        "id": "surplex-A7-42366-23",
+        "platform": "surplex",
+        "category": "industrial",
+        "title": "DMG GILDEMEISTER CTX ALPHA 300 3-Axis CNC Lathe",
+        "price": 5000,
+        "currency": "EUR",
+        "location": "DE",
+        "condition": "used-good",
+        "deadline": "2026-04-05T18:00:00Z",
+        "url": "https://www.surplex.com/en/l/dmg-gildemeister-ctx-alpha-300-3-axis-cnc-lathe-A7-42366-23",
+        "description_raw": "DMG Gildemeister, 3-axis CNC lathe, premium brand",
+        "buyers_premium_pct": 15
+      },
+      {
+        "id": "troostwijk-espresso-001",
+        "platform": "troostwijk",
+        "category": "restaurant-equipment",
+        "title": "Professional Espresso Machine 2 Group",
+        "price": 350,
+        "currency": "EUR",
+        "location": "NL",
+        "condition": "used-good",
+        "deadline": "2026-03-28T18:00:00Z",
+        "url": "https://www.troostwijkauctions.com/en/espresso-machines",
+        "description_raw": "Professional 2-group espresso machine, commercial grade",
+        "buyers_premium_pct": 15
+      }
+    ]
+  },
+
+  "scout_dest_results": {
+    "platforms_searched": 1,
+    "comparables": {
+      "surplex-A1-43079-27": [
+        {"platform": "olx", "title": "Strung CNC", "price": 45000, "currency": "RON", "price_eur": 8824, "similarity_score": 0.6, "status": "active"},
+        {"platform": "olx", "title": "Strung CNC industrial", "price": 55000, "currency": "RON", "price_eur": 10784, "similarity_score": 0.5, "status": "active"}
+      ],
+      "surplex-A7-42366-23": [
+        {"platform": "olx", "title": "CNC DMG lathe", "price": 75000, "currency": "RON", "price_eur": 14706, "similarity_score": 0.8, "status": "active"},
+        {"platform": "olx", "title": "Strung CNC DMG Gildemeister", "price": 85000, "currency": "RON", "price_eur": 16667, "similarity_score": 0.9, "status": "active"}
+      ],
+      "troostwijk-espresso-001": [
+        {"platform": "olx", "title": "Espressor profesional CIME 2 grupuri", "price": 3900, "currency": "RON", "price_eur": 765, "similarity_score": 0.7, "status": "active"},
+        {"platform": "olx", "title": "Espressor profesional Astoria Touch 2Gr", "price": 5500, "currency": "RON", "price_eur": 1078, "similarity_score": 0.8, "status": "active"},
+        {"platform": "olx", "title": "Espressor Profesional Astoria MCE Touch SAE2", "price": 7000, "currency": "RON", "price_eur": 1373, "similarity_score": 0.75, "status": "active"},
+        {"platform": "olx", "title": "Espressor profesional generic", "price": 8160, "currency": "RON", "price_eur": 1600, "similarity_score": 0.6, "status": "active"},
+        {"platform": "olx", "title": "Espressor Expobar Rosetta 2 Group", "price": 4499, "currency": "RON", "price_eur": 882, "similarity_score": 0.85, "status": "active"}
+      ]
+    }
+  },
+
+  "scout_logistics_results": {
+    "routes": [
+      {"lot_id": "surplex-A1-43079-27", "from": "CZ", "to": "RO", "distance_km": 1100, "cost_eur": 1540, "vehicle_type": "truck-24t", "estimated_days": 4, "source": "static-table"},
+      {"lot_id": "surplex-A7-42366-23", "from": "DE", "to": "RO", "distance_km": 1600, "cost_eur": 2240, "vehicle_type": "truck-24t", "estimated_days": 4, "source": "static-table"},
+      {"lot_id": "troostwijk-espresso-001", "from": "NL", "to": "RO", "distance_km": 2100, "cost_eur": 2310, "vehicle_type": "van-3.5t", "estimated_days": 5, "source": "static-table"}
+    ]
+  }
+}

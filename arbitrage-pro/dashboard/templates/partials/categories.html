@@ -1,0 +1,71 @@
+{% if categories %}
+<!-- Tier summary bar -->
+<div class="flex gap-2 mb-4 flex-wrap">
+  {% for t in [1,2,3,4,5] %}
+  {% set ns = namespace(count=0) %}
+  {% for cat in categories %}{% if cat.tier == t %}{% set ns.count = ns.count + 1 %}{% endif %}{% endfor %}
+  {% if ns.count > 0 %}
+  <div class="badge tier-{{ t }}" style="border-radius: 6px; padding: 0.25rem 0.75rem;">
+    T{{ t }}: {{ ns.count }}
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+
+<!-- Category grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+  {% for cat in categories | sort(attribute='tier') %}
+  <div class="category-card border-l-2 {% if cat.tier == 1 %}border-l-[#22c55e]{% elif cat.tier == 2 %}border-l-[#58a6ff]{% elif cat.tier == 3 %}border-l-[#f59e0b]{% elif cat.tier == 4 %}border-l-[#ef4444]{% else %}border-l-[#64748b]{% endif %}">
+    <div class="flex items-start justify-between mb-2">
+      <div>
+        <div class="text-sm font-medium">{{ cat.name | replace('-', ' ') | replace('_', ' ') | title }}</div>
+        <div class="text-xs text-[#64748b] mt-0.5">{{ cat.label }}</div>
+      </div>
+      {% if cat.avg_roi is defined and cat.avg_roi is not none %}
+      <span class="font-mono text-sm font-bold {% if cat.avg_roi > 100 %}roi-positive{% elif cat.avg_roi > 30 %}text-[#58a6ff]{% elif cat.avg_roi > 0 %}roi-neutral{% else %}roi-negative{% endif %}">
+        {{ cat.avg_roi }}%
+      </span>
+      {% endif %}
+    </div>
+
+    <div class="flex items-center gap-3 text-xs text-[#64748b]">
+      {% if cat.runs is defined %}
+      <span>{{ cat.runs }} run{{ 's' if cat.runs != 1 }}</span>
+      {% endif %}
+      {% if cat.confidence is defined %}
+      <span class="font-mono {% if cat.confidence == 'HIGH' %}text-[#22c55e]{% elif cat.confidence == 'MEDIUM' %}text-[#f59e0b]{% else %}text-[#ef4444]{% endif %}">{{ cat.confidence }}</span>
+      {% endif %}
+      {% if cat.best_source is defined %}
+      <span>{{ cat.best_source }}</span>
+      {% endif %}
+    </div>
+
+    {% if cat.key_rule is defined %}
+    <div class="mt-2 text-xs text-[#94a3b8] leading-relaxed line-clamp-2">{{ cat.key_rule }}</div>
+    {% elif cat.reason is defined %}
+    <div class="mt-2 text-xs text-[#94a3b8] leading-relaxed line-clamp-2">{{ cat.reason }}</div>
+    {% elif cat.notes is defined %}
+    <div class="mt-2 text-xs text-[#94a3b8] leading-relaxed line-clamp-2">{{ cat.notes }}</div>
+    {% elif cat.status is defined %}
+    <div class="mt-2">
+      <span class="text-xs font-mono text-[#64748b]">{{ cat.status }}</span>
+      {% if cat.recheck_in is defined %}
+      <span class="text-xs text-[#64748b]"> &middot; recheck: {{ cat.recheck_in }}</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if cat.sell_source is defined %}
+    <div class="mt-2 flex items-center gap-1.5">
+      <div class="w-1.5 h-1.5 rounded-full bg-[#58a6ff]"></div>
+      <span class="text-xs text-[#58a6ff]">{{ cat.sell_source }}</span>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="glass-card p-8 text-center">
+  <div class="text-[#64748b] text-sm">No categories loaded.</div>
+</div>
+{% endif %}

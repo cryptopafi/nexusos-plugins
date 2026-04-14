@@ -1,0 +1,29 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <!-- Total Runs -->
+    <div class="kpi-card">
+      <div class="kpi-value text-[#f0f0f0]">{{ kpi.total_runs }}</div>
+      <div class="kpi-label">Runs</div>
+    </div>
+    <!-- BUY Deals -->
+    <div class="kpi-card">
+      <div class="kpi-value text-[#22c55e]">{{ kpi.buy_count }}</div>
+      <div class="kpi-label">BUY Signals</div>
+    </div>
+    <!-- Best ROI -->
+    <div class="kpi-card">
+      <div class="kpi-value text-[#58a6ff]">{{ kpi.top_roi }}%</div>
+      <div class="kpi-label">Best ROI</div>
+    </div>
+    <!-- Categories -->
+    <div class="kpi-card">
+      <div class="flex items-baseline gap-2">
+        <span class="kpi-value text-[#f0f0f0]">{{ kpi.total_categories }}</span>
+        <span class="text-xs font-mono text-[#64748b]">
+          <span class="text-[#22c55e]">{{ kpi.tier_counts.tier_1 }}</span>/<span class="text-[#58a6ff]">{{ kpi.tier_counts.tier_2 }}</span>/<span class="text-[#f59e0b]">{{ kpi.tier_counts.tier_3 }}</span>/<span class="text-[#ef4444]">{{ kpi.tier_counts.tier_4 }}</span>
+        </span>
+      </div>
+      <div class="kpi-label">Categories</div>
+    </div>
+  </div>
+</div>

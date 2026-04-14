@@ -1,0 +1,6 @@
+{
+  "name": "arbitrage-pro",
+  "version": "1.0.0",
+  "description": "Arbitrage Pro — EU auction-to-marketplace deal hunter",
+  "mcp_strategy": "global-only"
+}

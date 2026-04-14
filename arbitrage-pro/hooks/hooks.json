@@ -1,0 +1,17 @@
+[
+  {
+    "event": "pre-hunt",
+    "command": "hooks/pre-hunt.sh",
+    "description": "Verify prerequisites before hunt pipeline: jq installed, channel-config readable, state files exist"
+  },
+  {
+    "event": "post-hunt",
+    "command": "hooks/post-hunt.sh",
+    "description": "Update run counter in state.json, clean up temp HTML files older than 24h"
+  },
+  {
+    "event": "on-error",
+    "command": "hooks/on-error.sh",
+    "description": "Log error with timestamp, step, and message to state.json errors array"
+  }
+]

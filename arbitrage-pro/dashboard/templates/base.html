@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arbitrage Pro | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-[#0A0A0F] text-[#f0f0f0] font-sans min-h-screen antialiased">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 border-b border-white/5 backdrop-blur-xl bg-[#0A0A0F]/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#58a6ff] to-[#7c3aed] flex items-center justify-center">
+          <span class="text-white font-bold text-sm">A</span>
+        </div>
+        <h1 class="text-lg font-bold tracking-tight">Arbitrage Pro</h1>
+        <span class="text-xs font-mono text-[#64748b] hidden sm:inline">v1.0</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-xs font-mono text-[#64748b]">{{ now[:16] }}</span>
+        <a href="/api/docs" target="_blank" class="text-xs text-[#58a6ff] hover:text-[#79b8ff] transition-colors">API</a>
+        <a href="/health" target="_blank" class="text-xs text-[#64748b] hover:text-[#94a3b8] transition-colors">Health</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- KPI Bar (sticky) -->
+  <section id="kpi-bar" class="sticky top-[57px] z-40 border-b border-white/5 bg-[#0A0A0F]/90 backdrop-blur-lg"
+           hx-get="/partials/kpi" hx-trigger="every 60s" hx-swap="innerHTML">
+    {% include "partials/kpi-bar.html" %}
+  </section>
+
+  <!-- Tab Navigation -->
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
+    <div class="flex gap-1 border-b border-white/5" id="tabs">
+      <button class="tab-btn active" data-tab="deals" onclick="switchTab('deals')">
+        Deals <span class="ml-1 text-xs font-mono text-[#58a6ff]">{{ deals|length }}</span>
+      </button>
+      <button class="tab-btn" data-tab="categories" onclick="switchTab('categories')">
+        Categories <span class="ml-1 text-xs font-mono text-[#64748b]">{{ categories|length }}</span>
+      </button>
+      <button class="tab-btn" data-tab="history" onclick="switchTab('history')">
+        History <span class="ml-1 text-xs font-mono text-[#64748b]">{{ runs|length }}</span>
+      </button>
+      <button class="tab-btn" data-tab="hunt" onclick="switchTab('hunt')">
+        Hunt
+      </button>
+    </div>
+  </nav>
+
+  <!-- Tab Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <div id="tab-deals" class="tab-content active">
+      {% include "partials/deals.html" %}
+    </div>
+    <div id="tab-categories" class="tab-content hidden">
+      {% include "partials/categories.html" %}
+    </div>
+    <div id="tab-history" class="tab-content hidden">
+      {% include "partials/history.html" %}
+    </div>
+    <div id="tab-hunt" class="tab-content hidden">
+      {% include "partials/hunt-form.html" %}
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-4 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between text-xs text-[#64748b]">
+      <span>Arbitrage Pro | NexusOS</span>
+      <span class="font-mono">GraphQL + Machineseeker + Exa</span>
+    </div>
+  </footer>
+
+  <script>
+    // ===== Tab Navigation =====
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('active'); });
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.remove('hidden');
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+    }
+
+    // ===== Deal Card Toggle =====
+    function toggleDeal(id) {
+      const el = document.getElementById('deal-details-' + id);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    // ===== Deal Filtering =====
+    function filterDeals(verdict) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      document.querySelectorAll('.deal-card').forEach(card => {
+        if (verdict === 'all' || card.dataset.verdict === verdict) {
+          card.classList.remove('deal-hidden');
+        } else {
+          card.classList.add('deal-hidden');
+        }
+      });
+    }
+
+    // ===== Deal Sorting =====
+    function sortDeals(by) {
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-sort="' + by + '"]').classList.add('active');
+      const list = document.getElementById('deals-list');
+      if (!list) return;
+      const cards = Array.from(list.children);
+      cards.sort((a, b) => {
+        if (by === 'roi') return parseFloat(b.dataset.roi) - parseFloat(a.dataset.roi);
+        if (by === 'date') return (b.dataset.ts || '').localeCompare(a.dataset.ts || '');
+        if (by === 'category') return (a.dataset.category || '').localeCompare(b.dataset.category || '');
+        return 0;
+      });
+      cards.forEach(card => list.appendChild(card));
+    }
+
+    // ===== Mark Deal (Bid / Skip) =====
+    function markDeal(id, action) {
+      const card = document.getElementById('deal-details-' + id)?.closest('.deal-card');
+      if (!card) return;
+      card.classList.remove('marked-bid', 'marked-skip');
+      card.classList.add('marked-' + action);
+    }
+
+    // ===== Refresh Live Price =====
+    async function refreshPrice(lotId) {
+      const el = document.getElementById('price-result-' + lotId);
+      if (!el) return;
+      el.textContent = 'Fetching live price...';
+      try {
+        const resp = await fetch('/api/lot/' + encodeURIComponent(lotId));
+        const data = await resp.json();
+        if (data.error) {
+          el.textContent = 'Error: ' + data.error;
+        } else {
+          const price = data.current_bid_eur ? '\u20AC' + data.current_bid_eur.toFixed(0) : 'N/A';
+          const platform = data.platform ?? '?';
+          el.innerHTML = '<span class="text-[#22c55e]">Live:</span> ' + price +
+            ' | <span class="text-[#64748b]">Platform: ' + platform + '</span>' +
+            ' | <span class="text-[#64748b]">' + data.title + '</span>';
+        }
+      } catch (e) {
+        el.textContent = 'Failed to fetch: ' + e.message;
+      }
+    }
+
+    // ===== Auto-Scan Toggle =====
+    let autoScanInterval = null;
+    function toggleAutoScan(enabled) {
+      const dot = document.getElementById('autoscan-dot');
+      const status = document.getElementById('autoscan-status');
+      if (enabled) {
+        dot.classList.remove('bg-[#64748b]');
+        dot.classList.add('bg-[#22c55e]', 'pulse');
+        status.textContent = 'Active';
+        // In production this would call a backend endpoint to enable the LaunchAgent
+        fetch('/api/autoscan', { method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({enabled: true}) }).catch(() => {});
+      } else {
+        dot.classList.remove('bg-[#22c55e]', 'pulse');
+        dot.classList.add('bg-[#64748b]');
+        status.textContent = 'Idle';
+        fetch('/api/autoscan', { method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({enabled: false}) }).catch(() => {});
+      }
+    }
+  </script>
+</body>
+</html>

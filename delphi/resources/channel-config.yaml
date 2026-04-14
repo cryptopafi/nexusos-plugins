@@ -1,0 +1,299 @@
+# DELPHI PRO — Channel Configuration
+# Defines which channels are available per scout and per depth level
+
+scouts:
+  scout-web:
+    primary: [brave, perplexity-sonar, perplexity-sonar-pro, tavily]
+    secondary: [github]
+    fallback: [exa, duckduckgo, apify-google]
+    cli_tools: [brave-search.sh, nexus-perplexity.py]
+    # brave-search.sh        = Brave Web Search via curl
+    # nexus-perplexity.py    = Perplexity Sonar/Sonar-Pro via OpenRouter (dual-path, --depth standard|deep, --model override)
+    #                          Symlinked from ~/.nexus/scripts/nexus-perplexity.py so it ships with the plugin
+    mcp_tools: [mcp__tavily__tavily_search, mcp__exa__web_search_advanced_exa, mcp__duckduckgo__search, mcp__github__search_repositories, mcp__github__search_code, mcp__github__get_file_contents]
+    github_defaults:
+      perPage: 100
+      quality_filter: "stars:>50 pushed:>2025-01-01"
+      activates_when: "topic_type == tech"
+
+  scout-social:
+    primary: [x-twitter, reddit, hackernews]
+    fallback: [bluesky, linkedin]
+    cli_tools: [twikit, reddit-search.sh, hn-search.sh, goat]
+    apify_actors: [apify/tweet-scraper-v2]  # LinkedIn Apify actors removed (legal risk)
+    mcp_options:  # none installed yet
+      - adhikasp/mcp-twikit  # X/Twitter
+      - reddit-mcp-buddy  # Reddit (436 stars, no API key)
+      - hn-mcp  # HackerNews by karanb192
+      - bluesky-mcp  # Bluesky by semioz
+    dead_tools: [nitter, twint, snscrape, pushshift, proxycurl]  # ALL dead/broken/sued in 2026 — do NOT use
+    channel_status:
+      x-twitter:
+        status: IMPLEMENTED
+        primary_tool: "twikit (cli, pip package — needs Twitter account config)"
+        fallback: [apify-tweet-scraper-v2, brave-site-search]
+        mcp_option: "adhikasp/mcp-twikit (not yet installed)"
+        note: "Twikit needs Twitter account config. Until configured, use Brave site:x.com proxy. Rate limit: 2-3s delays. Apify fallback: $0.50/1K tweets."
+      reddit:
+        status: IMPLEMENTED
+        primary_tool: "reddit-search.sh CLI (JSON API, ~10 QPM, no auth needed)"
+        fallback_tool: "Brave site:reddit.com/r/{subreddit} discovery search"
+        mcp_option: "reddit-mcp-buddy (436 stars, no API key needed, not yet installed)"
+        note: "PRAW needs OAuth pre-approval since 2025. JSON API is reliable path. Pushshift DEAD — Arctic Shift for historical only."
+      hackernews:
+        status: IMPLEMENTED_OPTIMAL
+        primary_tool: "hn-search.sh CLI (Algolia API, 10K req/hr, zero auth)"
+        mcp_option: "hn-mcp by karanb192 (not yet installed)"
+        note: "Easiest platform. Zero friction, unlimited for our volume. Always use numericFilters=points>10."
+      bluesky:
+        status: NEEDS_AUTH
+        primary_tool: "Brave site:bsky.app search (no auth, always works)"
+        auth_tool: "goat CLI or atproto SDK (handles auth for direct API access)"
+        direct_api: "public.api.bsky.app — returns 403 without auth as of 2026-03"
+        mcp_option: "bluesky-mcp by semioz (not yet installed)"
+        query_syntax: "Lucene — '\"multi agent\" since:2026-01-01 lang:en'"
+        source_tier: T3
+        note: "Public API now requires auth token (403 without). Use Brave site:bsky.app as primary no-auth fallback. For direct API, use goat CLI or atproto SDK which handle auth."
+      linkedin:
+        status: BEST_EFFORT
+        primary_tool: "Brave/Exa site:linkedin.com (web search proxy only)"
+        do_not_use: [direct-scraping, apify-actors, proxycurl]
+        source_tier: T3
+        note: "LinkedIn actively sues scrapers. Web search proxy is the only safe approach."
+
+  scout-visual:
+    primary: [instagram, skool]
+    fallback: [discord, telegram]
+    apify_actors: [apify/instagram-scraper]
+    custom_scrapers: [skool-scraper]
+    channel_status:
+      instagram:
+        status: IMPLEMENTED
+        primary_tool: "apify-instagram (Apify apify/instagram-scraper via REST API)"
+        fallback_tool: [brave-site-search, instaloader]
+        cost: "~$0.005/result via Apify ($5/1K results)"
+        note: "Basic Display API dead (Dec 2024). Graph API only for owned accounts. Apify handles anti-bot (5-layer detection, residential proxies). Web search (Brave site:instagram.com) for discovery only — no engagement metrics. Instaloader free but fragile (1-2 req/30s). Captions/metadata extractable without media download."
+      skool:
+        status: IMPLEMENTED
+        primary_tool: "Custom scraper (ECHELON procedure skool-scraper)"
+        note: "Existing ECHELON procedure available for Skool scraping."
+
+  scout-video:
+    primary: [youtube]
+    fallback: [tiktok, podcast-index]
+    mcp_tools: []  # mcp__youtube-transcript__get-transcript is DEPRECATED/BROKEN — DO NOT USE
+    cli_tools: [youtube-search.sh, yt-dlp, youtube-transcript-api]  # youtube-search.sh is PRIMARY
+    apify_actors: [clockworks/tiktok-scraper]
+    channel_status:
+      youtube:
+        status: IMPLEMENTED
+        primary_tool: "youtube-search.sh CLI (3-tier transcript fallback)"
+        fallback_tool: "Brave search site:youtube.com"
+        deprecated: "mcp__youtube-transcript__get-transcript (BROKEN, DO NOT USE)"
+
+  scout-knowledge:
+    primary: [arxiv, semantic-scholar, openalex]
+    secondary: [github]
+    fallback: [clinicaltrials, wikipedia, gnews, guardian, rss]
+    mcp_tools: [mcp__arxiv__search_papers, mcp__openalex__search_works, mcp__wikipedia__wiki_search, mcp__github__search_repositories, mcp__github__search_code, mcp__github__get_file_contents]
+    github_scope: "reference implementations only — not general tool/framework discovery"
+
+  scout-deep:
+    primary: [opus-deep-research, tavily-research-deep]
+    d4_only: [gemini-deep-research]
+    requires_approval: [perplexity-deep-research]
+    mcp_tools: [mcp__tavily__tavily_research]
+    cli_tools: [claude, gemini-cli]
+
+  scout-finance:
+    primary: [yfinance, dexpaprika]
+    fallback: [ecb-cli, cryptopanic]
+    cli_tools: [yfinance, ~/.nexus/cli-tools/dexpaprika, ~/.nexus/cli-tools/ecb-sdw, ~/.nexus/cli-tools/cryptopanic]
+    # MCP→CLI migrated: dexpaprika, ecb-sdw, cryptopanic (2026-03-25)
+
+  scout-brand:
+    primary: [namesilo-api]
+    fallback: [rdap, brave-trademark]
+    cli_tools: [brand-search.sh]
+    activation_rules:
+      activates_when:
+        - "Topic contains 'find domains for', 'domain available', 'ce domenii sunt libere'"
+        - "Topic contains brand name + 'domain' or '.com' or '.ai'"
+        - "Marketing platform sends brainstorm list"
+        - "User asks 'cauta domenii pentru [brand]'"
+      does_not_activate_when:
+        - "Domain analysis/tech stack (scout-domain)"
+        - "General web search (scout-web)"
+
+  scout-domain:
+    primary: [whois, dns, headers, ssl, sitemap, tech]
+    fallback: [tavily-extract, tavily-crawl]
+    cli_tools: [domain-search.sh]
+    mcp_tools: [mcp__tavily__tavily_extract, mcp__tavily__tavily_crawl]
+    activation_rules:
+      activates_when:
+        - "Topic contains a domain name (example.com, *.io, *.ai, *.app)"
+        - "Topic contains 'competitor website', 'their site', 'tech stack of'"
+        - "Topic is about a specific product/service web infrastructure"
+        - "User provides URLs as input"
+        - "Topic type = BUSINESS with named companies for web analysis"
+        - "Topic asks 'what technology does X use', 'who hosts X', 'when was X registered'"
+      does_not_activate_when:
+        - "General knowledge queries (no domain target)"
+        - "Academic research (no websites to analyze)"
+        - "Social media research (scout-social handles that)"
+        - "Financial analysis (scout-finance handles that)"
+        - "News/current events without specific domain target"
+        - "Company mentioned only for context, not domain analysis"
+
+depth_routing:
+  D1:
+    always: [cortex, brave, perplexity-sonar]
+    # Perplexity accessed via OpenRouter (OPENROUTER_API_KEY from Keychain)
+    # perplexity-sonar = Sonar basic via OpenRouter ($0.001/q), cheapest option
+    conditional:
+      factual: [wikipedia]
+      social: [youtube, x-twitter]
+      tech: [github]
+    execution: direct
+    max_channels: 4
+
+  D2:
+    always: [cortex, brave, perplexity-sonar-pro, youtube, x-twitter, instagram]
+    conditional:
+      academic: [arxiv, semantic-scholar]
+      tech: [github, hackernews]
+      business: [linkedin, gnews]
+      finance: [yfinance, dexpaprika]
+    execution: direct_if_lte_5_channels_else_scouts
+    max_channels: 8
+
+  D3:
+    always: [all_D2, reddit, hackernews, gnews, guardian, opus-deep-research]
+    conditional:
+      academic: [openalex, clinicaltrials]
+      social: [bluesky, skool, discord]
+      finance: [ecb, cryptopanic]
+    execution: 3-5_scouts_parallel_plus_critic_plus_synthesizer
+    max_channels: 18
+
+  D4:
+    always: [all_D3, opus-deep-research, gemini-deep-research, nlm-corpus]
+    conditional:
+      all_remaining_channels: true
+    requires_approval: [perplexity-deep-research]
+    execution: 5_scouts_plus_critic_council_3x_plus_opus_synthesizer
+    max_channels: 25
+
+# Per-channel prompt templates for query optimization
+# Each template converts a raw topic into an optimized query for that channel
+query_templates:
+  brave:
+    template: "{topic} {year} best practices"
+    notes: "Keyword search. Add year for recency. Add domain terms."
+  perplexity-sonar:
+    # Perplexity accessed via OpenRouter (OPENROUTER_API_KEY from Keychain)
+    template: "What are the latest developments in {topic}? Include sources."
+    notes: "Natural language question. Sonar returns synthesized answer."
+  perplexity-sonar-pro:
+    # Perplexity accessed via OpenRouter (OPENROUTER_API_KEY from Keychain)
+    template: "Provide a comprehensive overview of {topic} in {year}. Include key players, recent developments, and expert opinions with citations."
+    notes: "Full question with context. Pro searches 15-20 sources."
+  tavily:
+    template: "{topic}"
+    notes: "Tavily handles query optimization internally. Pass raw topic."
+  exa:
+    template: "Research about {topic}"
+    notes: "Semantic/neural search. Phrase queries, not keywords."
+  arxiv:
+    template: 'ti:"{topic_keywords}" OR abs:"{topic_keywords}"'
+    notes: "Field-specific search. Use ti: for titles, abs: for abstracts. Quote phrases."
+  semantic-scholar:
+    template: "{topic}"
+    notes: "Semantic search. Phrase queries work best."
+  openalex:
+    template: "{topic}"
+    notes: "Broad academic. Good for citation trends."
+  reddit:
+    template: "{topic}"
+    discovery_template: '"{topic}" site:reddit.com/r/{subreddit}'
+    primary_tool: "reddit-search.sh CLI (JSON API, ~10 QPM, no auth)"
+    fallback_tool: "Brave site:reddit.com/r/{subreddit} discovery"
+    subreddits_by_type:
+      tech: [ClaudeAI, MachineLearning, LocalLLaMA, artificial, programming]
+      business: [startups, entrepreneur, SaaS, smallbusiness, marketing]
+      finance: [CryptoCurrency, investing, stocks]
+      health: [longevity, Supplements, Biohackers]
+    dead_tools: "Pushshift (dead — Arctic Shift for historical only). PRAW needs OAuth pre-approval since 2025."
+    notes: "JSON API is reliable path. Search specific subreddits per topic type. Site-wide search (reddit.com/search.json) as fallback with score>=3 filter. NEVER use r/all."
+  hackernews:
+    template: "{topic}"
+    best_url: "http://hn.algolia.com/api/v1/search?query={topic}&tags=story&numericFilters=points>10"
+    sort: "popularity"
+    quality_filter: "numericFilters=points>10"
+    notes: "Algolia API, 10K req/hr, zero auth. Easiest platform. Always use points>10 filter. Sort by popularity for quality, date for recency."
+  bluesky:
+    template: 'site:bsky.app "{topic}"'
+    api_endpoint: "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
+    api_call: 'app.bsky.feed.searchPosts?q="{topic}"&since=2026-01-01T00:00:00Z&lang=en'
+    query_syntax: "Lucene"
+    source_tier: T3
+    status: NEEDS_AUTH
+    notes: "Public API returns 403 without auth as of 2026-03. Use Brave site:bsky.app as primary. For direct API, use goat CLI or atproto SDK which handle auth."
+  linkedin:
+    template: 'site:linkedin.com "{topic}"'
+    primary_tool: "Brave/Exa web search proxy only"
+    do_not_use: "direct scraping, Apify actors, Proxycurl (all legal risk or dead)"
+    source_tier: T3
+    notes: "LinkedIn actively sues scrapers. Web search proxy is the only safe approach. Business/B2B topics only."
+  youtube:
+    template: "{topic} {year}"
+    notes: "Add year. Search via Brave site:youtube.com or YouTube Data API."
+  x-twitter:
+    template: "{topic} since:2025-01-01 -filter:replies min_faves:5"
+    advanced_operators: "from:{user}, since:{date}, until:{date}, min_retweets:{n}, min_faves:{n}, -filter:replies"
+    primary_tool: "twikit CLI (if account configured)"
+    fallback_tool: 'Brave/Exa with site:x.com "{topic}" min_faves:10'
+    rate_limit: "2-3s between requests (Twikit), no limit (web search proxy)"
+    dead_tools: "Nitter (dead Feb 2024), Twint (dead), snscrape (broken)"
+    notes: "Use X advanced search operators. Twikit is free but needs account. Brave site:x.com works as always-available fallback."
+  instagram:
+    template: "#{topic_hashtag}"
+    primary_tool: "Apify apify/instagram-scraper via REST API (if APIFY_API_KEY set)"
+    fallback_tool: "Brave site:instagram.com \"{topic}\" (free, discovery only)"
+    profile_search: "site:instagram.com/{username} via Brave"
+    hashtag_search: "Apify with {\"hashtag\": [\"topic\"], \"resultsLimit\": 10}"
+    notes: "Primary: Apify handles anti-bot internally. Fallback: Brave site search for discovery. Do NOT use direct HTTP to instagram.com. Captions extractable without media download."
+  guardian:
+    template: "{topic}"
+    notes: "Guardian API. Quality journalism, T1 source."
+  gnews:
+    template: "{topic}"
+    notes: "News aggregator. T2 source."
+  wikipedia:
+    template: "{topic_main_concept}"
+    notes: "Search main concept. Good for context building, T1 factual."
+  yfinance:
+    template: "{symbol}"
+    notes: "Direct symbol lookup. Not a search engine."
+  dexpaprika:
+    template: "{token_name}"
+    notes: "Search by token name or address."
+  github-repos:
+    template: "{topic} stars:>50 pushed:>2025-01-01"
+    notes: "Repo search. Append language:{lang} for tech-specific. Use org:{org} for org-scoped. Set perPage:100."
+  github-code:
+    template: "{pattern} language:{lang}"
+    notes: "Code search. Find implementations, patterns, specific functions. Set per_page:100."
+  gemini-deep-research:
+    template: "Conduct a comprehensive research report on {topic}. Include: current state of the art, key players and publications, recent developments in {year}, open challenges, and future directions. Cite all sources."
+    notes: "Detailed instruction. Gemini Deep Research produces 2-5K word reports."
+
+topic_type_detection:
+  tech: [AI, ML, programming, software, framework, API, tool, Claude, GPT, LLM, agent, code]
+  academic: [research, paper, study, journal, peer-reviewed, methodology, hypothesis]
+  business: [company, startup, market, competitor, revenue, pricing, B2B, SaaS, agency]
+  finance: [crypto, bitcoin, ethereum, stock, trading, DeFi, investment, fund, portfolio]
+  social: [trend, viral, opinion, community, discussion, what people think]
+  health: [medical, health, longevity, supplement, clinical, biomarker, drug]
+  news: [breaking, latest, update, announcement, launched, released, happened]

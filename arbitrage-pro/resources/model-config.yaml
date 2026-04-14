@@ -1,0 +1,69 @@
+# Arbitrage Pro — Model Routing Configuration
+# SINGLE SOURCE OF TRUTH for all model assignments
+# Edit this file to change models globally — all skills pick up changes
+
+roles:
+  orchestrator:
+    model: claude-sonnet-4-6
+    used_by: agents/arbitrage.md
+
+  scout_source:
+    model: claude-sonnet-4-6
+    used_by: skills/scout-source
+    reason: "Parses unstructured auction descriptions in NL/DE/FR. Apify primary, Exa/Delphi scout-web fallback."
+    delphi_deps: [scout-web]
+
+  scout_dest:
+    model: claude-sonnet-4-6
+    used_by: skills/scout-dest
+    reason: "Fuzzy product matching. OLX via Apify, eBay/Marktplaats via Exa (same engine as Delphi scout-web)."
+    delphi_deps: [scout-web]
+
+  lot_verifier:
+    model: claude-haiku-4-5
+    used_by: skills/lot-verifier
+    reason: "URL liveness checks + data completeness scoring — mechanical, no reasoning needed. Delphi Critic equivalent."
+
+  scout_logistics:
+    model: claude-haiku-4-5
+    used_by: skills/scout-logistics
+    reason: "API calls + simple math, no reasoning needed"
+
+  scout_signals:
+    model: claude-sonnet-4-6
+    used_by: skills/scout-signals
+    reason: "Wrapper — delegates to Delphi scout-finance (Haiku) + scout-web (Haiku). Sonnet for anomaly detection + signal interpretation."
+    delphi_deps: [scout-finance, scout-web]
+
+  scout_demand:
+    model: claude-sonnet-4-6
+    used_by: skills/scout-demand
+    reason: "Parses unstructured buyer requests. Reddit WTB via Delphi scout-social, Publi24/Kros via Exa."
+    delphi_deps: [scout-social, scout-web]
+
+  opportunity_engine:
+    model: claude-opus-4-6
+    used_by: skills/opportunity-engine
+    reason: "Signal-to-category correlation — hardest intellectual task, novel connections"
+
+  analyzer:
+    model: claude-sonnet-4-6
+    used_by: skills/analyzer
+    reason: "Structured profitability calc + risk scoring"
+
+  quality_gate:
+    model: claude-sonnet-4-6
+    used_by: skills/quality-gate
+    reason: "Live price re-verification via agent-browser + Exa. Upgraded from Haiku — needs tool orchestration for high-value deal checks."
+
+  reporter:
+    model: claude-sonnet-4-6
+    used_by: skills/reporter
+    reason: "HTML generation + deal copywriting"
+
+  store:
+    model: claude-haiku-4-5
+    used_by:
+      - skills/store-cortex
+      - skills/store-cache
+    reason: "Mechanical write operations"

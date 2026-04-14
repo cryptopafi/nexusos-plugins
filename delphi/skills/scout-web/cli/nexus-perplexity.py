@@ -1,0 +1,1 @@
+/Users/pafi/.nexus/scripts/nexus-perplexity.py

@@ -1,0 +1,142 @@
+# Tax Tables — Arbitrage Pro
+# VAT rates, platform fees, buyer premiums, handling estimates
+
+vat_rates:
+  RO: 0.21   # Romania 21% (from Aug 2025)
+  DE: 0.19
+  NL: 0.21
+  FR: 0.20
+  BE: 0.21
+  IT: 0.22
+  ES: 0.21
+  PL: 0.23
+  UK: 0.20
+  AT: 0.20
+  SE: 0.25
+
+# Intra-EU B2B: reverse charge = 0% VAT on purchase
+# Intra-EU B2C: destination country VAT applies
+# OSS threshold: €10,000/year total EU B2C sales
+
+buyer_premiums:
+  # RECALIBRATED 2026-03-21: Troostwijk premium is VARIABLE (8-19%) + VAT on premium
+  # Worst case: 19% + 21% VAT on premium = effective 23% on bid
+  # Best case: 8% (high-value pilot) + VAT = effective 9.7%
+  # Default: use worst case for conservative estimates
+  troostwijk: 0.23       # 19% premium + 21% VAT on premium = 22.99%, round to 23%
+  surplex: 0.23          # Same TBAuctions group, same premium structure
+  catawiki: 0.09          # 9% + €3 fixed
+  catawiki_fixed: 3.00
+  ritchie-bros: 0.15
+  euro-auctions: 0.12
+  netbid: 0.18
+  bidspotter: 0.18
+  klaravik: 0.12
+  vavato: 0.15
+
+platform_selling_fees:
+  olx: 0.00               # Free for sellers
+  ebay_private: 0.00       # Private EEA sellers: 0% (since March 2023)
+  ebay_business: 0.11      # ~8-13%, avg 11%
+  ebay_regulatory: 0.0035  # 0.35% regulatory fee
+  marktplaats: 0.00        # Seller free, buyer pays 5%
+  kleinanzeigen: 0.00      # Mostly free
+  vinted: 0.00             # Seller free, buyer pays 5% + €0.70
+  facebook: 0.00           # Local pickup = free
+  facebook_shipping: 0.10  # 10% if using FB Checkout
+
+handling_estimates:  # EUR per item, by category
+  restaurant-equipment: 30
+  industrial: 50
+  electronics: 15
+  office-furniture: 25
+  vehicles: 100
+  collectibles: 10
+  construction: 75
+  medical: 40
+  agricultural: 60
+  default: 20
+
+# Romanian business tax options (verified via Delphi research 2026-03-22)
+ro_tax:
+  pfa:
+    income_tax: 0.10       # 10% flat on net income
+    cass: 0.10             # Health insurance 10%, capped at 6× average salary
+    cas: 0.25              # Pension 25% of declared income (capped)
+    cas_optional_threshold: 9720  # EUR/year
+  srl:
+    micro_1pct: 0.01       # 1% turnover (with ≥1 employee, ≤€100K)
+    micro_3pct: 0.03       # 3% turnover (no employees)
+    micro_threshold: 100000  # EUR/year max for micro regime
+    profit_tax: 0.16       # Standard above micro threshold
+    dividend_tax: 0.16     # 16% on distributions (increased in 2026, was 5%)
+
+# ═══════════════════════════════════════════════════
+# LEGAL COMPLIANCE (Delphi research 2026-03-22)
+# ═══════════════════════════════════════════════════
+
+# VAT Margin Scheme (Art. 312 Cod Fiscal, Directiva 2006/112/CE art. 311-325)
+# Apply margin scheme when buying from: non-taxable person, VAT-exempt entity,
+# another margin scheme reseller, or taxable person who bought for personal use.
+# DO NOT apply when auction house charged standard VAT (you get deductible input VAT).
+# Margin = sell_price - buy_price. VAT = margin × (19/119) or (21/121).
+# Buyer's premium is part of cost basis under margin scheme.
+vat_margin_scheme:
+  applicable: true         # Romania supports margin scheme for second-hand goods
+  legal_basis: "Art. 312 Cod Fiscal, OUG 22/2025"
+  vat_formula: "margin × (vat_rate / (1 + vat_rate))"  # suta mărită
+  records_required:
+    - "Registrul bunurilor second-hand cumparate"
+    - "Registrul bunurilor second-hand vandute"
+  buyer_premium_treatment: "included in cost basis (purchase price)"
+
+# Reverse Charge — Intra-EU B2B (Art. 307 Cod Fiscal)
+# Both buyer + seller VAT-registered in different EU states → seller charges 0% VAT
+# Romanian SRL self-declares output VAT + deducts as input VAT → net zero
+# Report on form D301 (Declaratie recapitulativa)
+reverse_charge:
+  condition: "B2B, both VAT-registered, different EU states"
+  seller_vat: 0.00         # Seller charges 0% (intra-community supply)
+  buyer_self_declares: true
+  net_cash_effect: 0.00    # Output + input cancel out
+  form: "D301"
+
+# OSS (One-Stop Shop) — B2C cross-border EU sales
+oss:
+  threshold_eur: 10000     # Cumulative all EU destination countries
+  below_threshold: "apply Romanian VAT on all EU B2C sales"
+  above_threshold: "charge destination country VAT rate"
+  registration: "ANAF SPV portal, quarterly returns"
+  olx_domestic: "NOT subject to OSS (domestic RO sale)"
+  ebay_b2c: "subject to OSS if cross-border"
+  records_retention_years: 10
+
+# UK Post-Brexit Import (third country since Jan 1, 2021)
+uk_import:
+  customs_duty_range: "0-6.5%"  # By HS code, check TARIC
+  import_vat_base: "CIF value + customs duty"
+  import_vat_deductible: true   # If VAT-registered SRL
+  de_minimis_duty_free: 150     # EUR — below = no customs duty
+  low_value_fixed_fee: 4.90     # EUR, from Nov 2025
+  viability_rule: "UK price must be 15-20% below EU equivalent"
+
+# Consumer Protection (EU Directive 2019/771 + 2011/83/EU)
+consumer_protection:
+  warranty_used_goods_years: 1  # Reducible from 2 to 1 by agreement for second-hand
+  warranty_new_goods_years: 2
+  withdrawal_right_days: 14     # For online B2C sales
+  withdrawal_exception: "physical public auction (Art. 16(k)) — NO withdrawal right"
+  online_auction_platforms: "withdrawal RIGHT applies (Catawiki, eBay)"
+
+# VAT Registration Thresholds
+vat_registration:
+  mandatory_threshold_ron: 395000  # ~€78K, OUG 22/2025, from Sept 1, 2025
+  voluntary: true                   # Can register before threshold
+  recommended: "register voluntarily when EU B2B purchases are regular"
+
+# Entity Structure Recommendation by Revenue Phase
+recommended_structure:
+  phase_1: {max_revenue_eur: 40000, entity: "PFA normă de venit", tax: "minimal admin"}
+  phase_2: {max_revenue_eur: 78000, entity: "SRL micro 1%", tax: "1% turnover, no VAT"}
+  phase_3: {max_revenue_eur: 100000, entity: "SRL micro 1% + VAT", tax: "1% + margin scheme"}
+  phase_4: {above_eur: 100000, entity: "SRL profit tax + VAT", tax: "16% profit + margin scheme"}

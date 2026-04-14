@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2026-03-21T12:07:03Z",
+  "summary": {
+    "total": 17,
+    "passed": 17,
+    "failed": 0,
+    "partial": 0
+  },
+  "insights": [
+    "NL→RO transport (€2310) makes single low-value items unprofitable — need bulk or high-value",
+    "CNC lathes €2500+ → 90-110% ROI viable on NL/DE/CZ→RO routes",
+    "Brand premium (DMG Gildemeister) = 50-70% above generic CNC on OLX",
+    "Static transport tables give confidence=0.7 — Wave 2 API rates will improve to 1.0",
+    "B2B reverse charge (0% VAT) is critical — without it, +21% kills most margins"
+  ],
+  "calibration_v1_1": {
+    "risk_formula": "weighted avg (base + min(modifiers, 3)), not additive — FIXED",
+    "deal_score_divisor": "20 (was 10) — FIXED",
+    "verdict_thresholds": "BUY >40, WATCH 15-40, SKIP <15 — CALIBRATED"
+  }
+}
