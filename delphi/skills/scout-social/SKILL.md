@@ -13,11 +13,25 @@ Search text-based social media platforms for discussions, opinions, and communit
 
 ## What You Do NOT Do
 
-- You do NOT search video platforms (scout-video handles YouTube, TikTok, Podcast)
-- You do NOT search visual platforms (scout-visual handles Instagram, Skool, Discord)
-- You do NOT search the open web (scout-web handles that)
-- You do NOT evaluate source quality (Critic does that)
-- You do NOT synthesize findings (Synthesizer does that)
+<anti-example>
+Searching video platforms — scout-video handles YouTube, TikTok, Podcast.
+</anti-example>
+
+<anti-example>
+Searching visual platforms — scout-visual handles Instagram, Skool, Discord.
+</anti-example>
+
+<anti-example>
+Searching the open web — scout-web handles that.
+</anti-example>
+
+<anti-example>
+Evaluating source quality — Critic does that.
+</anti-example>
+
+<anti-example>
+Synthesizing findings — Synthesizer does that.
+</anti-example>
 
 ## Input
 
@@ -37,6 +51,23 @@ Search text-based social media platforms for discussions, opinions, and communit
 - Empty `channels` array: use all default channels for scout-social (x-twitter, reddit, hackernews)
 - `timeout_seconds` <= 0: default to 300
 - `max_results_per_channel` <= 0: default to 10
+
+## Edge Cases
+
+| Condition | Behavior |
+|---|---|
+| `topic` is empty or null | Return error `topic_required`; do not proceed |
+| `channels` is empty or omitted | Use all defaults: x-twitter, reddit, hackernews |
+| `timeout_seconds` ≤ 0 | Clamp to 300 |
+| `max_results_per_channel` ≤ 0 | Clamp to 10 |
+| Unknown channel name in `channels` | Skip unknown channel; include `unknown_channel` warning in `errors[]` |
+| X/Twitter Twikit not configured | Fall through to Brave `site:x.com` proxy silently |
+| Reddit JSON API returns 429 | Fall back to Brave `site:reddit.com/r/{subreddit}`; note in `errors[]` |
+| Bluesky API returns 403 (auth required) | Fall back to Brave `site:bsky.app`; note in `errors[]` |
+| All channels return zero results | Return `status: "empty"`, `findings: []` |
+| Duplicate URL found across channels | Keep the version with richer content (longer summary, more metadata) |
+| LinkedIn scrape attempted directly | Refuse; use web search proxy only |
+| Dead tool referenced (Nitter, Twint, snscrape, Pushshift) | Do not call; log `deprecated_tool` warning |
 
 ## Execution
 
@@ -175,6 +206,29 @@ Sort by engagement (upvotes + comments) within each channel, then merge.
 - Bluesky API fail → fallback to Brave `site:bsky.app` search
 - LinkedIn web search empty → skip, flag, continue (LinkedIn is always best-effort)
 - Zero results → return `status: "empty"`
+
+## Error Contract
+
+All errors follow this schema:
+
+```json
+{
+  "status": "error",
+  "error": "<error_code>",
+  "error_detail": "<human-readable description>",
+  "agent": "scout-social"
+}
+```
+
+| `error` code | Trigger condition | Behavior |
+|---|---|---|
+| `topic_required` | `topic` is empty, null, or missing | Return immediately; do not query any channel |
+| `all_channels_failed` | Every requested channel returned a tool error | Return error with `findings: []` |
+| `unknown_channel` | A channel name in `channels[]` is not in the supported list | Skip that channel; include warning in `errors[]`; continue |
+| `deprecated_tool` | Agent logic referenced Nitter, Twint, snscrape, Pushshift, or Proxycurl | Do not call; log warning in `errors[]`; continue with fallback |
+| `timeout` | Execution exceeds `timeout_seconds` | Return partial results collected so far with `status: "partial"` |
+
+Partial results (some channels succeeded, some failed) use `status: "partial"` with `findings` populated from successful channels and failed channels listed in `errors[]`.
 
 ## CLI Usage (standalone, without DELPHI)
 

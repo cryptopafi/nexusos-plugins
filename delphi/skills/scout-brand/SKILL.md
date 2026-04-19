@@ -53,6 +53,24 @@ Provide at minimum one of: `brand`, `domains`, or `domain` (for single check).
 - Empty `tlds`: default to `["com", "io", "ai", "co", "app", "dev"]`
 - `timeout_seconds` <= 0: default to 120
 
+## Error Contract
+
+All errors — input validation failures and runtime errors — return the same envelope:
+
+```json
+{"status": "error", "error": "<error_code>", "message": "<human-readable detail>"}
+```
+
+- `status`: always `"error"` for hard failures; `"partial"` when some results were obtained
+- `error`: machine-readable snake_case code (see Input Validation and Edge Cases for codes)
+- `message`: optional human-readable detail; omit if redundant with the code
+
+Partial results use `"status": "partial"` with an `errors` array alongside whatever data was collected:
+
+```json
+{"status": "partial", "errors": ["rdap_timeout:nexusai.dev"], "available": [...], "taken": [...]}
+```
+
 ## Execution
 
 ### Mode: availability
@@ -153,10 +171,19 @@ Full purchase recommendation with budget breakdown.
 }
 ```
 
-### Recommend mode additional fields:
+### Recommend mode output:
+
+In recommend mode the root-level `trademark_risk` field is omitted. Trademark risk lives exclusively inside `recommendation.trademark_risk` to avoid ambiguity.
 
 ```json
 {
+  "agent": "scout-brand",
+  "status": "complete",
+  "mode": "recommend",
+  "brand": "NexusAI",
+  "variants_checked": 30,
+  "available": [],
+  "taken": [],
   "budget_usd": 200,
   "recommendation": {
     "best_available": [],
@@ -171,7 +198,17 @@ Full purchase recommendation with budget breakdown.
       "remaining_budget": 167.01,
       "domains_affordable": 1
     },
-    "trademark_risk": {}
+    "trademark_risk": {
+      "risk_level": "medium",
+      "conflicts": [
+        {"title": "NEXUS trademark filing", "url": "https://tsdr.uspto.gov/...", "snippet": "..."}
+      ]
+    }
+  },
+  "metadata": {
+    "duration_ms": 4200,
+    "domains_checked": 30,
+    "source": "namesilo"
   }
 }
 ```
@@ -207,16 +244,20 @@ scout-brand is a CONDITIONAL scout. It activates ONLY when the research topic in
 - Social media brand monitoring (scout-social handles that)
 - Company mentioned only for research context, not domain discovery
 
-## Error Handling
+## Edge Cases
 
-- NameSilo API key missing → fall back to RDAP.org (slower, no pricing)
-- NameSilo API error/timeout → retry 1x → fall back to RDAP.org
-- RDAP.org timeout → skip domain, note in errors
-- Brave API key missing → trademark_risk = "unknown" (non-blocking)
-- Brave search fails → trademark_risk = "unknown" (non-blocking)
-- All checks fail → return `status: "error"` with details
-- Partial results → return `status: "partial"` with what you have
-- Rate limiting → NameSilo handles 200 domains/request; RDAP has 0.5s delay between requests
+| Condition | Behavior |
+|:---|:---|
+| NameSilo API key missing | Fall back to RDAP.org (slower, no pricing); `source: "rdap"` in each result |
+| NameSilo API error or timeout | Retry 1x; if still failing, fall back to RDAP.org |
+| RDAP.org timeout on a domain | Skip that domain; add `"rdap_timeout:<domain>"` to `errors[]`; return `status: "partial"` |
+| Brave API key missing | Set `trademark_risk.risk_level: "unknown"`, `conflicts: []`; non-blocking |
+| Brave search fails | Set `trademark_risk.risk_level: "unknown"`, `conflicts: []`; non-blocking |
+| All availability checks fail | Return `{"status": "error", "error": "all_checks_failed", "message": "NameSilo and RDAP both unavailable"}` |
+| Rate limit hit (RDAP) | Insert 0.5s delay between requests; continue |
+| `domains` list exceeds 200 entries | Split into batches of 200 for NameSilo; process sequentially |
+| `budget` <= 0 in recommend mode | Default `budget_usd` to 200; log warning in `metadata.warnings[]` |
+| `tlds` empty | Default to `["com", "io", "ai", "co", "app", "dev"]` |
 
 ## CLI Usage
 
